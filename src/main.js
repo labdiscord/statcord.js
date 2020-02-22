@@ -29,3 +29,5 @@ class StatCord {
     })
   }
 }
+
+module.exports = StatCord;
