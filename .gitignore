@@ -1,0 +1,4 @@
+.config/
+.env
+.glitch-assets
+shrinkwrap.yaml
