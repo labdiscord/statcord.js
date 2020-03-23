@@ -1,12 +1,13 @@
 var request = require('snekfetch').post
 class StatCord {
-  constructor(KEY, CLIENT, sharding = false) {
+  constructor(KEY, CLIENT, sharding = false, v12) {
     if(!KEY || typeof KEY != 'string') throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
     if(!CLIENT) throw new Error("You have provided an item that is not a object. Please replace the item (statcord-api)")
     this.baseURL = "https://statcord.com/apollo/post/stats"
     this.key = KEY;
     this.client = CLIENT;
     this.sharding = sharding
+    this.ver12 = v12
   }
   
   async post() { 
@@ -14,12 +15,21 @@ class StatCord {
     if(this.sharding == true) {
       var clientValues = await this.client.shard.fetchClientValues('guilds.size')
       guildSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
-    } else guildSize = this.client.guilds.size
+    } else {
+      if(this.ver12) {
+        guildSize = this.client.guilds.cache.size
+      } else guildSize = this.client.guilds.size
+    }
     var userSize = 0;
     if(this.sharding == true) {
       var clientValues = await this.client.shard.fetchClientValues('users.size')
       userSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
-    } else userSize = this.client.guilds.size    
+    } else {
+      if(this.ver12) {
+        userSize = this.client.users.cache.size
+      } else userSize = this.client.users.size
+    }
+    
     return await request(this.baseURL, {
       headers: {
        "Content-Type": "application/json" 
