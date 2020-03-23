@@ -20,13 +20,15 @@ class StatCord {
       var clientValues = await this.client.shard.fetchClientValues('users.size')
       userSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
     } else userSize = this.client.guilds.size    
-    return await request(this.baseURL)
-    .send({
+    return await request(this.baseURL, {
+      data: {
       id: this.client.user.id,
       key: this.key,
       servers: guildSize,
       users: userSize
+      }
     })
+
   }
 }
 
