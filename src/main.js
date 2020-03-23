@@ -21,12 +21,15 @@ class StatCord {
       userSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
     } else userSize = this.client.guilds.size    
     return await request(this.baseURL, {
-      data: {
-      id: this.client.user.id,
-      key: this.key,
-      servers: guildSize,
-      users: userSize
+      headers: {
+       "Content-Type": "application/json" 
       }
+    })
+    .send({
+      "id": this.client.user.id,
+      "key": this.key,
+      "servers": guildSize,
+      "users": userSize
     })
 
   }
