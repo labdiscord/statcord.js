@@ -9,15 +9,14 @@ var statcord = require("statcord.js");
 
 /**
 set shardingStatus to `true` if sharding, else, set as `false`
+set v12 to `true` if discord.js == 12.x, else, `false`
 **/
 
-var statClient = new statcord("KEY", DiscordClient, shardingStatus);
+var statClient = new statcord("KEY", DiscordClient, shardingStatus, v12);
 
 var req = statClient.post();
 
-//returns a normal <Object>, call <Request>.body in code.
-
-console.log(req.body); //message:'success',statusCode:200
+//returns a normal <HTTPRequest>, call <Request>.body in code and do whatever.
 ```
 
 ---
