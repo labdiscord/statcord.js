@@ -1,8 +1,8 @@
 var request = require('snekfetch').post
 class StatCord {
-  constructor(KEY = String, CLIENT = Object, sharding = false) {
+  constructor(KEY, CLIENT, sharding = false) {
     if(!KEY || typeof KEY != 'string') throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
-    if(!CLIENT || typeof CLIENT != 'object' || !CLIENT.user) throw new Error("You have provided an item that is not a object. Please replace the item (statcord-api)")
+    if(!CLIENT) throw new Error("You have provided an item that is not a object. Please replace the item (statcord-api)")
     this.baseURL = "https://statcord.com/apollo/post/stats"
     this.key = KEY;
     this.client = CLIENT;
