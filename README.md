@@ -3,6 +3,7 @@
 ---
 
 # Init
+## THIS MUST GO INSIDE YOUR READY EVENT
 
 ```js
 var statcord = require("statcord.js");
