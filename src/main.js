@@ -26,8 +26,12 @@ class StatCord {
       userSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
     } else {
       if(this.ver12) {
-        userSize = this.client.users.cache.size
-      } else userSize = this.client.users.size
+        userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+        return accumulator + currentValue;
+      }, 0);
+      } else userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+        return accumulator + currentValue;
+      }, 0);
     }
     
     return await request(this.baseURL, {
