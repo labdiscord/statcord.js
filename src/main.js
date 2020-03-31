@@ -29,7 +29,7 @@ class StatCord {
         userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
         return accumulator + currentValue;
       }, 0);
-      } else userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+      } else userSize = this.client.guilds.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
         return accumulator + currentValue;
       }, 0);
     }
