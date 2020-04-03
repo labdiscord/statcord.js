@@ -27,3 +27,7 @@ var req = statClient.post();
 Wanna ask something about the API?
 
 Contact us on [Discord](https://statcord.com/discord)
+
+<a href="http://statcord.com/discord" target="_blank">
+    <img src="https://discordapp.com/api/guilds/608711879858192479/embed.png" alt="Discord" height="30">
+</a>
