@@ -12,7 +12,7 @@ var statcord = require("statcord.js");
 set v12 to `true` if discord.js == 12.x, else, `false`
 **/
 
-var statClient = new statcord("KEY", DiscordClient, v12);
+var statClient = new statcord("KEY", DiscordClient);
 
 var req = statClient.post();
 
