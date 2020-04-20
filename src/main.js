@@ -12,27 +12,51 @@ class StatCord {
   
   async post() { 
     var guildSize = 0;
-    if(this.sharding == true) {
-      var clientValues = await this.client.shard.fetchClientValues('guilds.size')
-      guildSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
-    } else {
-      if(this.ver12) {
-        guildSize = this.client.guilds.cache.size
-      } else guildSize = this.client.guilds.size
-    }
+  if(this.ver12) {
+if(this.sharding == true) {
+  await this.client.shard.fetchClientValues('guilds.cache.size')
+  	.then(results => {
+  		guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
+  	})
+} else {
+guildSize = this.client.guilds.cache.size
+}
+} else {
+if(this.sharding == true) {
+  await this.client.shard.fetchClientValues('guilds.size')
+  	.then(results => {
+  		guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
+  	})
+} else {
+guildSize = this.client.guilds.size
+}
+}
     var userSize = 0;
-    if(this.sharding == true) {
-      var clientValues = await this.client.shard.fetchClientValues('users.size')
-      userSize = clientValues.reduce((prev, guildCount) => prev + guildCount, 0)
-    } else {
-      if(this.ver12) {
-        userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
-        return accumulator + currentValue;
-      }, 0);
-      } else userSize = this.client.guilds.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
-        return accumulator + currentValue;
-      }, 0);
-    }
+        if(this.ver12) {
+if(this.sharding == true) {
+  await this.client.shard.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)')
+  	.then(results => {
+  		userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
+  	})
+  	.catch(console.error);
+} else {
+  userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+  return accumulator + currentValue;
+}, 0);
+}
+} else {
+if(this.sharding == true) {
+  await this.client.shard.broadcastEval('this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)')
+  	.then(results => {
+  		userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
+  	})
+  	.catch(console.error);
+} else {
+  userSize = this.client.guilds.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+    return accumulator + currentValue;
+  }, 0);
+}
+}
     
     return await request(this.baseURL, {
       headers: {
