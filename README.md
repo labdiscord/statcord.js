@@ -9,11 +9,10 @@
 var statcord = require("statcord.js");
 
 /**
-set shardingStatus to `true` if sharding, else, set as `false`
 set v12 to `true` if discord.js == 12.x, else, `false`
 **/
 
-var statClient = new statcord("KEY", DiscordClient, shardingStatus, v12);
+var statClient = new statcord("KEY", DiscordClient, v12);
 
 var req = statClient.post();
 
