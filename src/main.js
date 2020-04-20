@@ -1,19 +1,29 @@
 var request = require('snekfetch').post
 class StatCord {
-  constructor(KEY, CLIENT, sharding = false, v12) {
+  constructor(KEY, CLIENT) {
     if(!KEY || typeof KEY != 'string') throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
     if(!CLIENT) throw new Error("You have provided an item that is not a object. Please replace the item (statcord-api)")
     this.baseURL = "https://statcord.com/apollo/post/stats"
     this.key = KEY;
     this.client = CLIENT;
-    this.sharding = sharding
-    this.ver12 = v12
   }
   
-  async post() { 
+  async post() {
+let ver12;
+if(require('discord.js').version >= '12'){
+ver12 = true
+} else {
+ver12 = false
+}
+let sharding;
+if(this.client.shard){
+sharding = true
+} else {
+sharding = false
+}
     var guildSize = 0;
-  if(this.ver12) {
-if(this.sharding == true) {
+  if(ver12) {
+if(sharding == true) {
   await this.client.shard.fetchClientValues('guilds.cache.size')
   	.then(results => {
   		guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
@@ -22,7 +32,7 @@ if(this.sharding == true) {
 guildSize = this.client.guilds.cache.size
 }
 } else {
-if(this.sharding == true) {
+if(sharding == true) {
   await this.client.shard.fetchClientValues('guilds.size')
   	.then(results => {
   		guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
@@ -32,8 +42,8 @@ guildSize = this.client.guilds.size
 }
 }
     var userSize = 0;
-        if(this.ver12) {
-if(this.sharding == true) {
+        if(ver12) {
+if(sharding == true) {
   await this.client.shard.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)')
   	.then(results => {
   		userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
@@ -45,7 +55,7 @@ if(this.sharding == true) {
 }, 0);
 }
 } else {
-if(this.sharding == true) {
+if(sharding == true) {
   await this.client.shard.broadcastEval('this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)')
   	.then(results => {
   		userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
