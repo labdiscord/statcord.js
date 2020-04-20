@@ -1,22 +1,13 @@
 # statcord.js
 
----
-
 # Init
-## THIS MUST GO INSIDE YOUR READY EVENT
-
+## This can go anywhere as long as it's in a bot event (like `ready` for example.)
 ```js
 var statcord = require("statcord.js");
 
-/**
-set v12 to `true` if discord.js == 12.x, else, `false`
-**/
-
 var statClient = new statcord("KEY", DiscordClient);
 
-var req = statClient.post();
 
-//returns a normal <HTTPRequest>, call <Request>.body in code and do whatever.
 ```
 
 ---
@@ -30,3 +21,6 @@ Contact us on [Discord](https://statcord.com/discord)
 <a href="http://statcord.com/discord" target="_blank">
     <img src="https://discordapp.com/api/guilds/608711879858192479/embed.png" alt="Discord" height="30">
 </a>
+
+# Anything else?
+> That's it. It now automagically posts the data for you. You're now welcome I guess.
