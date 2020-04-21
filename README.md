@@ -3,9 +3,9 @@
 # Init
 ## This can go anywhere as long as it's in a bot event (like `ready` for example.)
 ```js
-var statcord = require("statcord.js");
+let statcord = require("statcord.js");
 
-var statClient = new statcord("KEY", DiscordClient);
+let statClient = new statcord("KEY", DiscordClient);
 
 
 ```
