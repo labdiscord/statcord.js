@@ -1,32 +1,65 @@
-# statcord.js
+<h1 align="center" id="statcordjs">
+    statcord.js
+</h1>
 
-# Init
-## This should be placed inside the `ready` event only!!
+<h3 align="center">A simple API wrapper for statcord.com to connect your bot and get your bot stats.</h3>
+
+
+
+----
+
+<!-- Content -->
+## Installation
+
+Install via pip (recommended)
+
 ```js
-let statcord = require("statcord.js");
-
-let statClient = new statcord("KEY", DiscordClient);
+npm i statcord.js
 ```
-### Posting Once (Without Auto Post)
+
+## Features
+
+* AUTOMATIC server & user count updating.
+
+## Example Discord.js Setup
+
+### Posting Server & User Count
+
+
 ```js
-statClient.post()
+let Discord = require('discord.js')
+let Client = new Discord.Client()
+let Statcord = require('statcord.js')
+let statcord = new Statcord("statcord.com-ADDYOURKEYHERE", Client)
+
+Client.on('ready', async () => {
+  console.info("Attempting to post to Statcord.")
+  await statcord.post()
+})
 ```
 
-### Auto Posting
-```js
-statClient.autoPost()
-```
----
+## Contributing
 
-# Questions
+Contributions are always welcome!\
+Take a look at any existing issues on this repository for starting places to help contribute towards, or simply create your own new contribution to the project.
 
-Wanna ask something about the API?
+When you are ready, simply create a pull request for your contribution and we will review it whenever we can!
 
-Contact us on [Discord](https://statcord.com/discord)
+### Donating
+
+You can also help me and the project out by sponsoring me through a [donation on PayPal](http://paypal.me/deltafloof).
+
+
+## Discussion, Support and Issues
+
+Need support with this project, have found an issue or want to chat with others about contributing to the project?
+> Please check the project's issues page first for support & bugs!
+
+Not found what you need here?
+
+* If you have an issue, please create a GitHub issue here to report it, include as much detail as you can.
+* _Alternatively,_ You can join our Discord server to discuss any issue or to get support for the project.:
 
 <a href="http://statcord.com/discord" target="_blank">
     <img src="https://discordapp.com/api/guilds/608711879858192479/embed.png" alt="Discord" height="30">
 </a>
-
-# Anything else?
-> That's it. It now automagically posts the data for you. You're now welcome I guess.
