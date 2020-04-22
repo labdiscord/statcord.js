@@ -29,12 +29,11 @@ npm i statcord.js
 ```js
 let Discord = require('discord.js')
 let Client = new Discord.Client()
-let Statcord = require('statcord.js')
-let statcord = new Statcord("statcord.com-AddYourKeyHere", Client)
+let statcord = require('statcord.js')
+let statclient = new Statcord("statcord.com-AddYourKeyHere", Client)
 
 Client.on('ready', async () => {
-  console.info("Attempting to post to Statcord.")
-  await statcord.post()
+  await statclient.autoPost()
 })
 
 Client.login("YourDiscordBotTokenHere")
