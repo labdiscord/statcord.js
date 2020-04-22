@@ -98,7 +98,12 @@ class Statcord {
             })
             let json = await response.json();
             let status = await response.status();
-            console.log(json);
+            console.log(response)
+            console.log(json)
+            console.log(status)
+            if (status!==200){
+                throw new Error(response)
+            }
           } catch (error) {
             console.log(error);
           }
@@ -106,10 +111,7 @@ class Statcord {
         console.log("ho")
         console.log(status)
         console.log(json)
-        if(response === undefined || response === 'undefined' || response === /undefined/){
-            return true
-        }
-        return false
+        console.log(response)
     }
 
     async autoPost(){
