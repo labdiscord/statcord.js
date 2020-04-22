@@ -6,7 +6,7 @@
 let statcord = require("statcord.js");
 
 let statClient = new statcord("KEY", DiscordClient);
-
+statClient.post()
 
 ```
 
