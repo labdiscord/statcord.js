@@ -78,15 +78,12 @@ class StatCord {
                 body: body,
                 json: true // Automatically stringifies the body to JSON
             };
-
-            let response;
             await rp(options).then(res => {
-            response = res.body
+            return res.body
             }).catch(err => {
             console.log(err)
             throw new Error(err)
             })
-            return response
     }
 
 async autoPost(){
@@ -155,14 +152,12 @@ async autoPost(){
       body: body,
       json: true // Automatically stringifies the body to JSON
   };
-let response;
 await rp(options).then(res => {
-response = res.body
+return res.body
 }).catch(err => {
 console.log(err)
 throw new Error(err)
 })
-return response
 }, 2700000)
 }
 }
