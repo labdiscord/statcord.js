@@ -96,11 +96,14 @@ class Statcord {
                 body:    JSON.stringify(body),
                 headers: { 'Content-Type': 'application/json' },
             })
-            let json = await response.json();
-            let status = await response.status;
             console.log(response)
-            console.log(json)
+            
+            let status = await response.status;
             console.log(status)
+            
+            let text = await response.text();
+            console.log(text)
+            
             if (status!==200){
                 throw new Error(response)
             }
