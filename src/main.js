@@ -95,11 +95,6 @@ class Statcord {
     async autoPost(){
         setInterval(async function() {
             let response = await this.post()
-            if (!response){
-                console.error(response)
-            }else{
-                console.log("SUCCESS!")
-            }
         }, 2700000)
     }
 }
