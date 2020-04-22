@@ -14,6 +14,7 @@ class Statcord {
     }
 
     async post() {
+        console.log("Called")
         let ver12;
         if (this.client.guilds.cache) {
             ver12 = true
@@ -70,6 +71,7 @@ class Statcord {
                 }, 0);
             }
         }
+        
         let body = {
             "id": this.client.user.id,
             "key": this.key,
@@ -82,10 +84,12 @@ class Statcord {
             body: body,
             json: true // Automatically stringifies the body to JSON
         };
+        console.log("hm")
         let response;
             await rp(options)
             .then(res => {response = res.body})
             .catch(err => {throw new Error(err)})
+        console.log("ho")
         if(response === undefined || response === 'undefined' || response === /undefined/){
             return true
         }
@@ -93,7 +97,9 @@ class Statcord {
     }
 
     async autoPost(){
+        console.log("Booting Up")
         setInterval(async function() {
+            console.log("POSTING")
             let response = await this.post()
         }, 2700000)
     }
