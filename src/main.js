@@ -101,5 +101,5 @@ class StatCord {
             }
         }, 60000 * 45)
     }
-
+}
 module.exports = StatCord;
