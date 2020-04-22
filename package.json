@@ -4,7 +4,8 @@
   "description": "Upload Statcord info to the official API!",
   "main": "src/main.js",
   "dependencies": {
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+"node-cron": "^2.0.3"
   },
   "devDependencies": {},
   "scripts": {
