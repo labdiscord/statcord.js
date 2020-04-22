@@ -6,7 +6,10 @@ class StatCord {
         this.baseURL = "https://statcord.com/apollo/post/stats"
         this.key = KEY;
         this.client = CLIENT;
-        return setInterval(async function () {
+    }
+
+    async post() {
+         return setInterval(async function () {
             let ver12;
             if (this.client.guilds.cache) {
                 ver12 = true
@@ -78,11 +81,6 @@ class StatCord {
                     "users": userSize
                 })
         }, 60000 * 45)
-    }
-
-    async post() {
-
-
     }
 }
 
