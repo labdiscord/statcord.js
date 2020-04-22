@@ -1,6 +1,6 @@
 {
   "name": "statcord.js",
-  "version": "1.6.0",
+  "version": "1.5.1",
   "description": "Upload StatCord info to the official API!",
   "main": "src/main.js",
   "dependencies": {
