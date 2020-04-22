@@ -81,7 +81,6 @@ class StatCord {
             await rp(options).then(res => {
             return res.body
             }).catch(err => {
-            console.log(err)
             throw new Error(err)
             })
     }
@@ -155,7 +154,6 @@ async autoPost(){
 await rp(options).then(res => {
 return res.body
 }).catch(err => {
-console.log(err)
 throw new Error(err)
 })
 }, 2700000)
