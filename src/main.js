@@ -85,7 +85,7 @@ let response;
             throw new Error(err)
             })
 if(response === undefined || response === 'undefined' || response === /undefined/){
-response = response.replace(/undefined/, 'Success')
+return 'Success'
 }
 return response
     }
@@ -163,7 +163,7 @@ async autoPost(){
               throw new Error(err)
               })
   if(response === undefined || response === 'undefined' || response === /undefined/){
-  response = response.replace(/undefined/, 'Success')
+return 'Success'
   }
   return response
 }, 2700000)
