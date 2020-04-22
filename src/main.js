@@ -97,7 +97,7 @@ class Statcord {
                 headers: { 'Content-Type': 'application/json' },
             })
             let json = await response.json();
-            let status = await response.status();
+            let status = await response.status;
             console.log(response)
             console.log(json)
             console.log(status)
