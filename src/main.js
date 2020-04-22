@@ -80,17 +80,23 @@ let response;
                     'Content-Type': 'application/json'
                 }
             }).then(async responsee => {
+if(response === undefined || response === 'undefined' || response === /undefined/){
+throw new Error('An unexpected error occured')
+} else {
           response = {
           message: responsee.statusText,
           statusCode: response.status
           }
           s = true
+}
           }).catch(async err => {
           throw new Error(err)
           })
           if(s === true){
           return response
-          }
+          } else {
+throw new Error('Something is Wrong')
+}
     }
 
 async autoPost(){
@@ -162,16 +168,22 @@ await fetch(this.baseURL, {
           'Content-Type': 'application/json'
       }
   }).then(async responsee => {
+if(response === undefined || response === 'undefined' || response === /undefined/){
+throw new Error('An unexpected error occured')
+} else {
 response = {
 message: responsee.statusText,
 statusCode: response.status
 }
 s = true
+}
 }).catch(async err => {
 throw new Error(err)
 })
 if(s === true){
 return response
+} else {
+throw new Error('Something is Wrong')
 }
 }, 2700000)
 }
