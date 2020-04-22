@@ -13,7 +13,7 @@
 
 Install via pip (recommended)
 
-```js
+```shell
 npm i statcord.js
 ```
 
