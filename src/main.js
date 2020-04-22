@@ -89,21 +89,23 @@ class Statcord {
            await rp(options)
             .then(res => {response = res.body})
             .catch(err => {throw new Error(err)})*/
-        let res,status;
         
-        fetch(this.baseURL, {
+        try {
+            const response = await fetch(this.baseURL, {
                 method: 'post',
                 body:    JSON.stringify(body),
                 headers: { 'Content-Type': 'application/json' },
             })
-            .then(res =>
-                { status = res.status; 
-                  return res.json()
-                 })
-            .then(json => console.log(json));
+            let json = await response.json();
+            let status = await response.status();
+            console.log(json);
+          } catch (error) {
+            console.log(error);
+          }
+        
         console.log("ho")
         console.log(status)
-        console.log(res)
+        console.log(json)
         if(response === undefined || response === 'undefined' || response === /undefined/){
             return true
         }
