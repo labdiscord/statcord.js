@@ -79,22 +79,18 @@ let response;
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(res => res.json())
-            .then(async responsee => {
+            }).then(async responsee => {
           response = {
-          message: responsee.message,
-          statusCode: responsee.statusCode
+          message: responsee.statusText,
+          statusCode: response.status
           }
-            }).catch(async function(err) {
-          response = err
-            })
-if(response.statusCode){
-          if(response.statusCode === 200){
+          s = true
+          }).catch(async err => {
+          throw new Error(err)
+          })
+          if(s === true){
           return response
-          } else {
-          throw new Error(response)
           }
-} else throw new Error(response)
     }
 
 async autoPost(){
@@ -158,28 +154,25 @@ async autoPost(){
       "users": userSize
   }
 let response;
+let s = false
 await fetch(this.baseURL, {
       method: 'post',
       body: JSON.stringify(body),
       headers: {
           'Content-Type': 'application/json'
       }
-  }).then(res => res.json())
-  .then(async responsee => {
+  }).then(async responsee => {
 response = {
-message: responsee.message,
-statusCode: responsee.statusCode
+message: responsee.statusText,
+statusCode: response.status
 }
-  }).catch(async function(err) {
-response = err
-  })
-  if(response.statusCode){
-            if(response.statusCode === 200){
-            return response
-            } else {
-            throw new Error(response)
-            }
-  } else throw new Error(response)
+s = true
+}).catch(async err => {
+throw new Error(err)
+})
+if(s === true){
+return response
+}
 }, 2700000)
 }
 }
