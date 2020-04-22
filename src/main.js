@@ -72,33 +72,13 @@ class StatCord {
                 "servers": guildSize,
                 "users": userSize
             }
-            let response;
-            await fetch(this.baseURL, {
+          return await fetch(this.baseURL, {
                 method: 'post',
                 body: JSON.stringify(body),
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(res => res.json()).then(json => {
-                response = {
-                    message: json.message,
-                    statusCode: json.statusCode
-                }
-            }).catch(err => {
-                response = {
-                    message: err.message,
-                    statusCode: err.statusCode
-                }
             })
-            if (response.statusCode === 200) {
-                return response
-            } else {
-                function Failed(message, code) {
-                    this.message = message;
-                    this.statusCode = code;
-                }
-                throw new Failed(response.message, response.statusCode)
-            }
         }, 60000 * 45)
     }
 }
