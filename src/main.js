@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+var rp = require('request-promise');
 
 class StatCord {
     constructor(KEY, CLIENT) {
@@ -72,31 +72,14 @@ class StatCord {
                 "servers": guildSize,
                 "users": userSize
             }
-let response;
-         await fetch(this.baseURL, {
-                method: 'post',
-                body: JSON.stringify(body),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(async responsee => {
-if(response === undefined || response === 'undefined' || response === /undefined/){
-throw new Error('An unexpected error occured')
-} else {
-          response = {
-          message: responsee.statusText,
-          statusCode: response.status
-          }
-          s = true
-}
-          }).catch(async err => {
-          throw new Error(err)
-          })
-          if(s === true){
-          return response
-          } else {
-throw new Error('Something is Wrong')
-}
+            var options = {
+                method: 'POST',
+                uri: this.baseURL,
+                body: body,
+                json: true // Automatically stringifies the body to JSON
+            };
+
+          return await rp(options)
     }
 
 async autoPost(){
@@ -159,32 +142,14 @@ async autoPost(){
       "servers": guildSize,
       "users": userSize
   }
-let response;
-let s = false
-await fetch(this.baseURL, {
-      method: 'post',
-      body: JSON.stringify(body),
-      headers: {
-          'Content-Type': 'application/json'
-      }
-  }).then(async responsee => {
-if(response === undefined || response === 'undefined' || response === /undefined/){
-throw new Error('An unexpected error occured')
-} else {
-response = {
-message: responsee.statusText,
-statusCode: response.status
-}
-s = true
-}
-}).catch(async err => {
-throw new Error(err)
-})
-if(s === true){
-return response
-} else {
-throw new Error('Something is Wrong')
-}
+  var options = {
+      method: 'POST',
+      uri: this.baseURL,
+      body: body,
+      json: true // Automatically stringifies the body to JSON
+  };
+
+return await rp(options)
 }, 2700000)
 }
 }
