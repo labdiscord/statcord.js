@@ -1,4 +1,4 @@
-var request = require('snekfetch').post
+const fetch = require('node-fetch');
 class StatCord {
     constructor(KEY, CLIENT) {
         if (!KEY || typeof KEY != 'string') throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
@@ -9,7 +9,7 @@ class StatCord {
     }
 
     async post() {
-         return setInterval(async function () {
+         setInterval(async function () {
             let ver12;
             if (this.client.guilds.cache) {
                 ver12 = true
@@ -22,7 +22,7 @@ class StatCord {
             } else {
                 sharding = false
             }
-            var guildSize = 0;
+            let guildSize = 0;
             if (ver12) {
                 if (sharding == true) {
                     await this.client.shard.fetchClientValues('guilds.cache.size')
@@ -68,18 +68,39 @@ class StatCord {
                     }, 0);
                 }
             }
-
-            return await request(this.baseURL, {
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                .send({
+             let body = {
                     "id": this.client.user.id,
                     "key": this.key,
                     "servers": guildSize,
                     "users": userSize
-                })
+                }
+             let response;
+await fetch(this.baseURL, {
+        method: 'post',
+        body:    JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(json => {
+response = {
+message: json.message,
+statusCode: json.statusCode
+}
+}).catch(err => {
+response = {
+message: err.message,
+statusCode: err.statusCode
+}
+})
+if(response.statusCode === 200){
+return response
+} else {
+  function Failed(message, code) {
+     this.message = message;
+     this.statusCode = code;
+  }
+throw new Failed(response.message, response.statusCode)
+}
         }, 60000 * 45)
     }
 }
