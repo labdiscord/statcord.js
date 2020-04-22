@@ -1,15 +1,21 @@
 # statcord.js
 
 # Init
-## This can go anywhere as long as it's in a bot event (like `ready` for example.)
+## This should be placed inside the `ready` event only!!
 ```js
 let statcord = require("statcord.js");
 
 let statClient = new statcord("KEY", DiscordClient);
+```
+### Posting Once (Without Auto Post)
+```js
 statClient.post()
-
 ```
 
+### Auto Posting
+```js
+statClient.autoPost()
+```
 ---
 
 # Questions

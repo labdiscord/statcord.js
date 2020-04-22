@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const cron = require('node-cron');
+
 class StatCord {
     constructor(KEY, CLIENT) {
         if (!KEY || typeof KEY != 'string')
@@ -14,7 +14,6 @@ class StatCord {
     }
 
     async post() {
-cron.schedule('45 * * * *', async function () {
             let ver12;
             if (this.client.guilds.cache) {
                 ver12 = true
@@ -73,14 +72,93 @@ cron.schedule('45 * * * *', async function () {
                 "servers": guildSize,
                 "users": userSize
             }
-          return await fetch(this.baseURL, {
+         await fetch(this.baseURL, {
                 method: 'post',
                 body: JSON.stringify(body),
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            })
-})
+            }).then(res => res.json())
+   .then(async response => {
+  return `[statcord.js] ${response}`
+   }).catch(async function(err) {
+      if(err) throw new Error(err)
+   })
     }
+
+async autoPost(){
+   setInterval(async function() {
+  let ver12;
+  if (this.client.guilds.cache) {
+      ver12 = true
+  } else {
+      ver12 = false
+  }
+  let sharding;
+  if (this.client.shard) {
+      sharding = true
+  } else {
+      sharding = false
+  }
+  let guildSize = 0;
+  if (ver12) {
+      if (sharding == true) {
+          await this.client.shard.fetchClientValues('guilds.cache.size').then(results => {
+              guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
+          })
+      } else {
+          guildSize = this.client.guilds.cache.size
+      }
+  } else {
+      if (sharding == true) {
+          await this.client.shard.fetchClientValues('guilds.size').then(results => {
+              guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
+          })
+      } else {
+          guildSize = this.client.guilds.size
+      }
+  }
+  let userSize = 0;
+  if (ver12) {
+      if (sharding == true) {
+          await this.client.shard.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)').then(results => {
+              userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
+          }).catch(console.error);
+      } else {
+          userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+              return accumulator + currentValue;
+          }, 0);
+      }
+  } else {
+      if (sharding == true) {
+          await this.client.shard.broadcastEval('this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)').then(results => {
+              userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
+          }).catch(console.error);
+      } else {
+          userSize = this.client.guilds.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
+              return accumulator + currentValue;
+          }, 0);
+      }
+  }
+  let body = {
+      "id": this.client.user.id,
+      "key": this.key,
+      "servers": guildSize,
+      "users": userSize
+  }
+await fetch(this.baseURL, {
+      method: 'post',
+      body: JSON.stringify(body),
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  }).then(res => res.json())
+.then(async response => {
+return `[statcord.js] ${response}`
+}).catch(async function(err) {
+if(err) throw new Error(err)
+})
+}, 2700000)
+}
 }
 module.exports = StatCord;
