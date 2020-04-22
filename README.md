@@ -11,7 +11,7 @@
 <!-- Content -->
 ## Installation
 
-Install via pip (recommended)
+Install via npm (recommended)
 
 ```shell
 npm i statcord.js
