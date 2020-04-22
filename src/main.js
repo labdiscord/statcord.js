@@ -98,9 +98,10 @@ class Statcord {
 
     async autoPost(){
         console.log("Booting Up")
+        await this.post()
         setInterval(async function() {
             console.log("POSTING")
-            let response = await this.post()
+            await this.post()
         }, 2700000)
     }
 }
