@@ -1,6 +1,6 @@
 var rp = require('request-promise');
 
-class StatCord {
+class Statcord {
     constructor(KEY, CLIENT) {
         if (!KEY || typeof KEY != 'string')
             throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
@@ -96,10 +96,12 @@ class StatCord {
         setInterval(async function() {
             let response = await this.post()
             if (!response){
-                throw new Error(response)
+                console.error(response)
+            }else{
+                console.log("SUCCESS!")
             }
         }, 2700000)
     }
 }
 
-module.exports = StatCord;
+module.exports = Statcord;
