@@ -1,4 +1,4 @@
-var rp = require('request-promise');
+const fetch = require('node-fetch');
 
 class Statcord {
     constructor(KEY, CLIENT) {
@@ -78,7 +78,7 @@ class Statcord {
             "servers": guildSize,
             "users": userSize
         }
-        var options = {
+        /*var options = {
             method: 'POST',
             uri: this.baseURL,
             body: body,
@@ -86,10 +86,24 @@ class Statcord {
         };
         console.log("hm")
         let response;
-            await rp(options)
+           await rp(options)
             .then(res => {response = res.body})
-            .catch(err => {throw new Error(err)})
+            .catch(err => {throw new Error(err)})*/
+        let res,status;
+        
+        fetch(this.baseURL, {
+                method: 'post',
+                body:    JSON.stringify(body),
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res =>
+                { status = res.status; 
+                  return res.json()
+                 })
+            .then(json => console.log(json));
         console.log("ho")
+        console.log(status)
+        console.log(res)
         if(response === undefined || response === 'undefined' || response === /undefined/){
             return true
         }
