@@ -1,19 +1,20 @@
 const fetch = require('node-fetch');
+const cron = require('node-cron');
 class StatCord {
     constructor(KEY, CLIENT) {
-        if (!KEY || typeof KEY != 'string') 
+        if (!KEY || typeof KEY != 'string')
             throw new Error("You have provided an item that is not a string. Please replace the item (statcord-api)")
-        
-        if (!CLIENT) 
+
+        if (!CLIENT)
             throw new Error("You have provided an item that is not a object. Please replace the item (statcord-api)")
-        
+
         this.baseURL = "https://statcord.com/apollo/post/stats"
         this.key = KEY;
         this.client = CLIENT;
     }
 
     async post() {
-        setInterval(async function () {
+cron.schedule('45 * * * *', async function () {
             let ver12;
             if (this.client.guilds.cache) {
                 ver12 = true
@@ -79,7 +80,7 @@ class StatCord {
                     'Content-Type': 'application/json'
                 }
             })
-        }, 60000 * 45)
+})
     }
 }
 module.exports = StatCord;
