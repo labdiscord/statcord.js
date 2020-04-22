@@ -30,7 +30,7 @@ npm i statcord.js
 let Discord = require('discord.js')
 let Client = new Discord.Client()
 let statcord = require('statcord.js')
-let statclient = new Statcord("statcord.com-AddYourKeyHere", Client)
+let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
 
 Client.on('ready', async () => {
   await statclient.autoPost()
