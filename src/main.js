@@ -72,6 +72,7 @@ class StatCord {
                 "servers": guildSize,
                 "users": userSize
             }
+let response;
          await fetch(this.baseURL, {
                 method: 'post',
                 body: JSON.stringify(body),
@@ -79,11 +80,21 @@ class StatCord {
                     'Content-Type': 'application/json'
                 }
             }).then(res => res.json())
-   .then(async response => {
-  return `[statcord.js] ${response}`
-   }).catch(async function(err) {
-      if(err) throw new Error(err)
-   })
+            .then(async responsee => {
+          response = {
+          message: responsee.message,
+          statusCode: responsee.statusCode
+          }
+            }).catch(async function(err) {
+          response = err
+            })
+if(response.statusCode){
+          if(response.statusCode === 200){
+          return response
+          } else {
+          throw new Error(response)
+          }
+} else throw new Error(response)
     }
 
 async autoPost(){
@@ -146,6 +157,7 @@ async autoPost(){
       "servers": guildSize,
       "users": userSize
   }
+let response;
 await fetch(this.baseURL, {
       method: 'post',
       body: JSON.stringify(body),
@@ -153,11 +165,21 @@ await fetch(this.baseURL, {
           'Content-Type': 'application/json'
       }
   }).then(res => res.json())
-.then(async response => {
-return `[statcord.js] ${response}`
-}).catch(async function(err) {
-if(err) throw new Error(err)
-})
+  .then(async responsee => {
+response = {
+message: responsee.message,
+statusCode: responsee.statusCode
+}
+  }).catch(async function(err) {
+response = err
+  })
+  if(response.statusCode){
+            if(response.statusCode === 200){
+            return response
+            } else {
+            throw new Error(response)
+            }
+  } else throw new Error(response)
 }, 2700000)
 }
 }
