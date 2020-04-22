@@ -78,11 +78,16 @@ class StatCord {
                 body: body,
                 json: true // Automatically stringifies the body to JSON
             };
+let response;
             await rp(options).then(res => {
-            return res.body
+            response = res.body
             }).catch(err => {
             throw new Error(err)
             })
+if(response === undefined || response === 'undefined' || response === /undefined/){
+response = response.replace(/undefined/, 'Success')
+}
+return response
     }
 
 async autoPost(){
@@ -151,11 +156,16 @@ async autoPost(){
       body: body,
       json: true // Automatically stringifies the body to JSON
   };
-await rp(options).then(res => {
-return res.body
-}).catch(err => {
-throw new Error(err)
-})
+  let response;
+              await rp(options).then(res => {
+              response = res.body
+              }).catch(err => {
+              throw new Error(err)
+              })
+  if(response === undefined || response === 'undefined' || response === /undefined/){
+  response = response.replace(/undefined/, 'Success')
+  }
+  return response
 }, 2700000)
 }
 }
