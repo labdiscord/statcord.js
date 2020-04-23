@@ -1,5 +1,5 @@
 <h1 align="center" id="statcordjs">
-    statcord.js
+    statcord.js BETA
 </h1>
 
 <h3 align="center">A simple API wrapper for statcord.com to connect your bot and get your bot stats.</h3>
@@ -14,7 +14,7 @@
 Install via npm (recommended)
 
 ```shell
-npm i statcord.js
+npm i statcord.js-beta
 ```
 
 ## Features
@@ -29,7 +29,7 @@ npm i statcord.js
 ```js
 let Discord = require('discord.js')
 let Client = new Discord.Client()
-let statcord = require('statcord.js')
+let statcord = require('statcord.js-beta')
 let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
 
 Client.on('ready', async () => {
