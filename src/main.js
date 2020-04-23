@@ -76,23 +76,24 @@ class Statcord {
             "servers": guildSize,
             "users": userSize
         }
-        
-        try {
-            const response = await fetch(this.baseURL, {
+        let response;
+  await fetch(this.baseURL, {
                 method: 'post',
                 body:    JSON.stringify(body),
                 headers: { 'Content-Type': 'application/json' },
-            })
-            
-            let status = await response.status;
-            let text = await response.text();
-            
-            if (status!==200){
-                throw new Error(text)
-            }
-          } catch (error) {
-            console.log(error);
-          }
+            }).then(res => {
+    response = {
+      message: res.statusText,
+      statusCode: res.status
+    }
+  }).catch(err => {
+   console.log(err)
+  })
+      if(response.statusCode === 200){
+        console.log(response)
+      } else {
+        console.log(response)
+      }
     }
 
     async autoPost(){
@@ -100,8 +101,9 @@ class Statcord {
         await this.post()
         
         setInterval(async function(arg1) {
+          console.log("POSTING")
             await arg1.post()
-        }, 2700000,this)
+        }, 3600000,this)
     }
 }
 
