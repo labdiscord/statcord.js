@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-
 class Statcord {
     constructor(KEY, CLIENT) {
         if (!KEY || typeof KEY != 'string')
@@ -14,7 +13,6 @@ class Statcord {
     }
 
     async post() {
-        console.log("Called")
         let ver12;
         if (this.client.guilds.cache) {
             ver12 = true
@@ -78,17 +76,6 @@ class Statcord {
             "servers": guildSize,
             "users": userSize
         }
-        /*var options = {
-            method: 'POST',
-            uri: this.baseURL,
-            body: body,
-            json: true // Automatically stringifies the body to JSON
-        };
-        console.log("hm")
-        let response;
-           await rp(options)
-            .then(res => {response = res.body})
-            .catch(err => {throw new Error(err)})*/
         
         try {
             const response = await fetch(this.baseURL, {
@@ -96,34 +83,25 @@ class Statcord {
                 body:    JSON.stringify(body),
                 headers: { 'Content-Type': 'application/json' },
             })
-            console.log(response)
             
             let status = await response.status;
-            console.log(status)
-            
             let text = await response.text();
-            console.log(text)
             
             if (status!==200){
-                throw new Error(response)
+                throw new Error(text)
             }
           } catch (error) {
             console.log(error);
           }
-        
-        console.log("ho")
-        console.log(status)
-        console.log(json)
-        console.log(response)
     }
 
     async autoPost(){
-        console.log("Booting Up")
+        console.log("Statcord Auto Post Started")
         await this.post()
-        setInterval(async function() {
-            console.log("POSTING")
-            await this.post()
-        }, 2700000)
+        
+        setInterval(async function(arg1) {
+            await arg1.post()
+        }, 2700000,this)
     }
 }
 
