@@ -29,7 +29,7 @@ npm i statcord.js
 ```js
 let Discord = require('discord.js')
 let Client = new Discord.Client()
-let statcord = require('statcord.js-beta')
+let statcord = require('statcord.js')
 let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
 
 Client.on('ready', async () => {
