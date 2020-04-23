@@ -2,10 +2,10 @@ const fetch = require('node-fetch');
 class Statcord {
     constructor(KEY, CLIENT) {
         if (!KEY || typeof KEY != 'string')
-            console.error("You have provided an item that is not a string. Please replace the item (statcord-api)")
+            return console.error("You have provided an item that is not a string. Please replace the item (statcord-api)")
 
         if (!CLIENT)
-            console.error("You have provided an item that is not a object. Please replace the item (statcord-api)")
+            return console.error("You have provided an item that is not a object. Please replace the item (statcord-api)")
 
         this.baseURL = "https://statcord.com/apollo/post/stats"
         this.key = KEY;
