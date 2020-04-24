@@ -32,9 +32,10 @@ let Client = new Discord.Client()
 let statcord = require('statcord.js')
 let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
 ```
-#### Put the following code in a function such as on ready*/
+#### Put the following code in a function such as on ready (Requires async)
+```js
 await statclient.autoPost()
-
+```
 
 ## Contributing
 
