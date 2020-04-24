@@ -1,11 +1,10 @@
 {
-  "name": "statcord.js",
-  "version": "1.5.15",
+  "name": "statcord.js-beta",
+  "version": "1.6.0",
   "description": "Upload Statcord info to the official API!",
   "main": "src/main.js",
   "dependencies": {
-    "request": "^2.88.2",
-    "request-promise": "^4.2.5"
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -22,5 +21,6 @@
     "bot-stats"
   ],
   "author": "Statcord.com",
-  "license": "ISC"
+  "license": "ISC",
+  "homepage": "https://github.com/labdiscord/statcord.js"
 }
