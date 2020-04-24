@@ -31,13 +31,10 @@ let Discord = require('discord.js')
 let Client = new Discord.Client()
 let statcord = require('statcord.js')
 let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
-
-Client.on('ready', async () => {
-  await statclient.autoPost()
-})
-
-Client.login("YourDiscordBotTokenHere")
 ```
+#### Put the following code in a function such as on ready*/
+await statclient.autoPost()
+
 
 ## Contributing
 
