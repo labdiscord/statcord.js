@@ -21,17 +21,6 @@ npm i statcord.js
 
 * AUTOMATIC server & user count updating.
 
-### Import Statcord.Js
-```js
-let statcord = require('statcord.js')
-let statclient = new statcord("statcord.com-AddYourKeyHere", client)
-```
-### Put the following code in a function such as on ready (Requires async)
-```js
-await statclient.autoPost()
-```
-
-
 
 ## Example Discord.js Setup
 
