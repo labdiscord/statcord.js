@@ -10,17 +10,21 @@ class Statcord {
       console.error(
         "You have provided an item that is not a object. Please replace the item (statcord-api)"
       );
-
     this.baseURL = "https://beta.statcord.com/mason/stats";
     this.key = KEY;
     this.client = CLIENT;
     this.active = [];
     this.commands = 0;
     this.popular = [];
-        if (this.client.guilds.cache) {
+  }
+
+  async post() {
+    if (require('discord.js').version >= '12.0.0') {
       this.ver12 = true
+      console.log('You are in v12 discord.js')
     } else {
       this.ver12 = false
+      console.log('You are not in v12 discord.js')
     }
         if (this.client.shard) {
       if(this.ver12 === true){
@@ -33,9 +37,6 @@ class Statcord {
       this.sharding = false;
       this.shard_id = false
     }
-  }
-
-  async post() {
     if(this.shard_id === true) return;
     let guildSize = 0;
     if (this.ver12 === true) {
@@ -179,6 +180,24 @@ await array.push(member.id)
     );
   }
   async postCommand(command, author_id) {
+    if (require('discord.js').version >= '12.0.0') {
+      this.ver12 = true
+      console.log('You are in v12 discord.js')
+    } else {
+      this.ver12 = false
+      console.log('You are not in v12 discord.js')
+    }
+        if (this.client.shard) {
+      if(this.ver12 === true){
+      if(this.client.shard.ids[0] !== 0) this.shard_id = true
+      } else {
+        if(this.client.shard.id !== 0) this.shard_id = true
+      }
+      this.sharding = true;
+    } else {
+      this.sharding = false;
+      this.shard_id = false
+    }
     if(this.sharding === false){
     if (!command || typeof command != "string")
       return console.error("You didn't provide enough parameters");
