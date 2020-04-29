@@ -17,31 +17,29 @@ class Statcord {
     this.active = [];
     this.commands = 0;
     this.popular = [];
+        if (this.client.guilds.cache) {
+      this.ver12 = true
+    } else {
+      this.ver12 = false
+    }
+        if (this.client.shard) {
+      if(this.ver12 === true){
+      if(this.client.shard.ids[0] !== 0) this.shard_id = true
+      } else {
+        if(this.client.shard.id !== 0) this.shard_id = true
+      }
+      this.sharding = true;
+    } else {
+      this.sharding = false;
+      this.shard_id = false
+    }
   }
 
   async post() {
-    let ver12;
-    if (this.client.guilds.cache) {
-      ver12 = true;
-    } else {
-      ver12 = false;
-    }
-    let sharding;
-    let m = true
-    if (this.client.shard) {
-      if(ver12){
-      if(this.client.shard.ids[0] !== 0) m = false
-      } else {
-        if(this.client.shard.id !== 0) m = false
-      }
-      sharding = true;
-    } else {
-      sharding = false;
-    }
-        if(m === false) return
+    if(this.shard_id === true) return;
     let guildSize = 0;
-    if (ver12) {
-      if (sharding == true) {
+    if (this.ver12 === true) {
+      if (this.sharding == true) {
         await this.client.shard
           .fetchClientValues("guilds.cache.size")
           .then(results => {
@@ -54,7 +52,7 @@ class Statcord {
         guildSize = this.client.guilds.cache.size;
       }
     } else {
-      if (sharding == true) {
+      if (this.sharding == true) {
         await this.client.shard
           .fetchClientValues("guilds.size")
           .then(results => {
@@ -68,8 +66,8 @@ class Statcord {
       }
     }
     let userSize = 0;
-    if (ver12) {
-      if (sharding == true) {
+    if (this.ver12 === true) {
+      if (this.sharding == true) {
 await this.client.shard.broadcastEval(`
 let array = []
 for(const data of this.guilds.cache.array()){
@@ -95,7 +93,7 @@ await array.push(member.id)
         userSize = array.length
       }
     } else {
-      if (sharding == true) {
+      if (this.sharding == true) {
 await this.client.shard.broadcastEval(`
 let array = []
 for(const data of this.guilds.array()){
@@ -182,26 +180,7 @@ await array.push(member.id)
     );
   }
   async postCommand(command, author_id) {
-    console.log('Worked')
-    let ver12;
-    if (this.client.guilds.cache) {
-      ver12 = true;
-    } else {
-      ver12 = false;
-    }
-    let sharding;
-    let m = true
-    if (this.client.shard) {
-      if(ver12){
-      if(this.client.shard.ids[0] !== 0) m = false
-      } else {
-        if(this.client.shard.id !== 0) m = false
-      }
-      sharding = true;
-    } else {
-      sharding = false;
-    }
-    if(sharding === false){
+    if(this.sharding === false){
     if (!command || typeof command != "string")
       return console.error("You didn't provide enough parameters");
 
@@ -223,7 +202,7 @@ await array.push(member.id)
       this.popular[objIndex].count = fi.count + 1;
     }
     } else {
-      if(m === true){
+      if(this.shard_id === false){
             if (!command || typeof command != "string")
       return console.error("You didn't provide enough parameters");
 
@@ -246,19 +225,8 @@ await array.push(member.id)
     }
       } else {
       this.client.shard.broadcastEval(`
-    let ver12;
-    if (this.guilds.cache) {
-      ver12 = true;
-    } else {
-      ver12 = false;
-    }
-    let m = true
-      if(ver12){
-      if(this.shard.ids[0] !== 0) m = false
-      } else {
-        if(this.shard.id !== 0) m = false
-      }
-if(m === false){
+let m = ${this.shard_id}
+if(m === true){
 const statcord = require('statcord.js-beta')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
