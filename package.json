@@ -1,6 +1,6 @@
 {
   "name": "statcord.js-beta",
-  "version": "1.7.4",
+  "version": "2.0.0",
   "description": "Upload Statcord info to the official API!",
   "main": "src/main.js",
   "dependencies": {
