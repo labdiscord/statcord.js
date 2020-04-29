@@ -160,7 +160,7 @@ await array.push(member.id)
     this.popular = [];
 
     if (response.statusCode === 200) {
-      console.log(response);
+      //console.log(response);
     } else {
       console.log(response);
     }
@@ -172,7 +172,6 @@ await array.push(member.id)
 
     setInterval(
       async function(arg1) {
-        console.log("POSTING");
         await arg1.post();
       },
       3600000,
