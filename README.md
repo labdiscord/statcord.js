@@ -1,5 +1,5 @@
 <h1 align="center" id="statcordjs">
-    statcord.js BETA
+    statcord.js
 </h1>
 
 <h3 align="center">A simple API wrapper for statcord.com to connect your bot and get your bot stats.</h3>
@@ -14,31 +14,45 @@
 Install via npm (recommended)
 
 ```shell
-npm i statcord.js-beta
+npm i statcord.js
 ```
 
 ## Features
 
 * AUTOMATIC server & user count updating.
 
+
 ## Example Discord.js Setup
 
 ### Posting Server & User Count
-
-
 ```js
 let Discord = require('discord.js')
-let Client = new Discord.Client()
-let statcord = require('statcord.js-beta')
-let statclient = new statcord("statcord.com-AddYourKeyHere", Client)
+let client = new Discord.Client()
 
-Client.on('ready', async () => {
+client.on('ready', async () => {
+  
   await statclient.autoPost()
 })
-
-Client.login("YourDiscordBotTokenHere")
+ 
+client.login("YourDiscordBotTokenHere")
 ```
 
+### Posting Server & User Counts, Commands Run, Popular Commands & Active Users
+```js
+let Discord = require('discord.js')
+let client = new Discord.Client()
+let statcord = require('statcord.js')
+let statclient = new statcord("statcord.com-AddYourKeyHere", client)
+const prefix = 'YourPrefix'
+
+client.on('message', message => {
+    const args = message.content.slice(prefix.length).trim().split(/ +/g);
+    const command = args.shift().toLowerCase();
+    statclient.postCommand(command, message.author.id)
+})
+ 
+client.login("YourDiscordBotTokenHere")
+```
 ## Contributing
 
 Contributions are always welcome!\
