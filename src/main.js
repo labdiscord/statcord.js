@@ -27,14 +27,18 @@ class Statcord {
       ver12 = false;
     }
     let sharding;
-    let m;
+    let m = true
     if (this.client.shard) {
+      if(ver12){
       if(this.client.shard.ids[0] !== 0) m = false
+      } else {
+        if(this.client.shard.id !== 0) m = false
+      }
       sharding = true;
     } else {
       sharding = false;
     }
-    if(m === false) return;
+        if(m === false) return
     let guildSize = 0;
     if (ver12) {
       if (sharding == true) {
@@ -66,43 +70,55 @@ class Statcord {
     let userSize = 0;
     if (ver12) {
       if (sharding == true) {
-        await this.client.shard
-          .broadcastEval(
-            "this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)"
-          )
-          .then(results => {
-            userSize = results.reduce(
-              (prev, memberCount) => prev + memberCount,
-              0
-            );
-          })
-          .catch(console.error);
+await this.client.shard.broadcastEval(`
+let array = []
+for(const data of this.guilds.cache.array()){
+for(const member of data.members.cache.array()){
+if(array.includes(member.id)) continue;
+array.push(member.id)
+}
+}
+array.length
+`).then(re => {
+for(const data of re){
+  userSize = userSize + data
+}
+}).catch(err => console.log(err))
       } else {
-        userSize = this.client.guilds.cache
-          .map(g => g.memberCount)
-          .reduce(function(accumulator, currentValue) {
-            return accumulator + currentValue;
-          }, 0);
+let array = []
+for(const data of this.client.guilds.cache.array()){
+  for(const member of data.members.cache.array()){
+if(array.includes(member.id)) continue;
+await array.push(member.id)
+}
+}
+        userSize = array.length
       }
     } else {
       if (sharding == true) {
-        await this.client.shard
-          .broadcastEval(
-            "this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)"
-          )
-          .then(results => {
-            userSize = results.reduce(
-              (prev, memberCount) => prev + memberCount,
-              0
-            );
-          })
-          .catch(console.error);
+await this.client.shard.broadcastEval(`
+let array = []
+for(const data of this.guilds.array()){
+for(const member of data.members.array()){
+if(array.includes(member.id)) continue;
+array.push(member.id)
+}
+}
+array.length
+`).then(re => {
+for(const data of re){
+  userSize = userSize + data
+}
+}).catch(err => console.log(err))
       } else {
-        userSize = this.client.guilds
-          .map(g => g.memberCount)
-          .reduce(function(accumulator, currentValue) {
-            return accumulator + currentValue;
-          }, 0);
+let array = []
+for(const data of this.client.guilds.array()){
+  for(const member of data.members.array()){
+if(array.includes(member.id)) continue;
+await array.push(member.id)
+}
+}
+        userSize = array.length
       }
     }
     let popular = [];
@@ -167,10 +183,20 @@ class Statcord {
   }
   async postCommand(command, author_id) {
     console.log('Worked')
-        let sharding;
-    let m;
+    let ver12;
+    if (this.client.guilds.cache) {
+      ver12 = true;
+    } else {
+      ver12 = false;
+    }
+    let sharding;
+    let m = true
     if (this.client.shard) {
+      if(ver12){
       if(this.client.shard.ids[0] !== 0) m = false
+      } else {
+        if(this.client.shard.id !== 0) m = false
+      }
       sharding = true;
     } else {
       sharding = false;
@@ -197,7 +223,7 @@ class Statcord {
       this.popular[objIndex].count = fi.count + 1;
     }
     } else {
-      if(this.client.shard.ids[0] === 0){
+      if(m === true){
             if (!command || typeof command != "string")
       return console.error("You didn't provide enough parameters");
 
@@ -219,7 +245,21 @@ class Statcord {
       this.popular[objIndex].count = fi.count + 1;
     }
       } else {
-      this.client.shard.broadcastEval(`if(this.shard.ids[0] !== 0){
+      this.client.shard.broadcastEval(`
+    let ver12;
+    if (this.guilds.cache) {
+      ver12 = true;
+    } else {
+      ver12 = false;
+    }
+    let m = true
+      if(ver12){
+      if(this.shard.ids[0] !== 0) m = false
+      } else {
+        if(this.shard.id !== 0) m = false
+      }
+if(m === false){
+const statcord = require('statcord.js')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
 }
