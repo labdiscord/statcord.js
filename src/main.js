@@ -259,7 +259,7 @@ await array.push(member.id)
         if(this.shard.id !== 0) m = false
       }
 if(m === false){
-const statcord = require('statcord.js')
+const statcord = require('statcord.js-beta')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
 }
