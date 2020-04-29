@@ -1,110 +1,232 @@
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 class Statcord {
-    constructor(KEY, CLIENT) {
-        if (!KEY || typeof KEY != 'string')
-            return console.error("You have provided an item that is not a string. Please replace the item (statcord-api)")
+  constructor(KEY, CLIENT) {
+    if (!KEY || typeof KEY != "string")
+      console.error(
+        "You have provided an item that is not a string. Please replace the item (statcord-api)"
+      );
 
-        if (!CLIENT)
-            return console.error("You have provided an item that is not a object. Please replace the item (statcord-api)")
+    if (!CLIENT)
+      console.error(
+        "You have provided an item that is not a object. Please replace the item (statcord-api)"
+      );
 
-        this.baseURL = "https://statcord.com/apollo/post/stats"
-        this.key = KEY;
-        this.client = CLIENT;
+    this.baseURL = "https://beta.statcord.com/mason/stats";
+    this.key = KEY;
+    this.client = CLIENT;
+    this.active = [];
+    this.commands = 0;
+    this.popular = [];
+  }
+
+  async post() {
+    let ver12;
+    if (this.client.guilds.cache) {
+      ver12 = true;
+    } else {
+      ver12 = false;
     }
-
-    async post() {
-        let ver12;
-        if (this.client.guilds.cache) {
-            ver12 = true
-        } else {
-            ver12 = false
-        }
-        let sharding;
-        if (this.client.shard) {
-            sharding = true
-        } else {
-            sharding = false
-        }
-        let guildSize = 0;
-        if (ver12) {
-            if (sharding == true) {
-                await this.client.shard.fetchClientValues('guilds.cache.size').then(results => {
-                    guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
-                })
-            } else {
-                guildSize = this.client.guilds.cache.size
-            }
-        } 
-        else {
-            if (sharding == true) {
-                await this.client.shard.fetchClientValues('guilds.size').then(results => {
-                    guildSize = results.reduce((prev, guildCount) => prev + guildCount, 0)
-                })
-            } 
-            else {
-                guildSize = this.client.guilds.size
-            }
-        }
-        let userSize = 0;
-        if (ver12) {
-            if (sharding == true) {
-                await this.client.shard.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)').then(results => {
-                    userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
-                }).catch(console.error);
-            } 
-            else {
-                userSize = this.client.guilds.cache.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
-                    return accumulator + currentValue;
-                }, 0);
-            }
-        } 
-        else {
-            if (sharding == true) {
-                await this.client.shard.broadcastEval('this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)').then(results => {
-                    userSize = results.reduce((prev, memberCount) => prev + memberCount, 0)
-                }).catch(console.error);
-            }else {
-                userSize = this.client.guilds.map(g => g.memberCount).reduce(function (accumulator, currentValue) {
-                    return accumulator + currentValue;
-                }, 0);
-            }
-        }
-        
-        let body = {
-            "id": this.client.user.id,
-            "key": this.key,
-            "servers": guildSize,
-            "users": userSize
-        }
-        let response;
-  await fetch(this.baseURL, {
-                method: 'post',
-                body:    JSON.stringify(body),
-                headers: { 'Content-Type': 'application/json' },
-            }).then(res => {
-    response = {
-      message: res.statusText,
-      statusCode: res.status
+    let sharding;
+    let m;
+    if (this.client.shard) {
+      if(this.client.shard.ids[0] !== 0) m = false
+      sharding = true;
+    } else {
+      sharding = false;
     }
-  }).catch(err => {
-   console.log(err)
-  })
-      if(response.statusCode === 200){
-        console.log(response)
+    if(m === false) return;
+    let guildSize = 0;
+    if (ver12) {
+      if (sharding == true) {
+        await this.client.shard
+          .fetchClientValues("guilds.cache.size")
+          .then(results => {
+            guildSize = results.reduce(
+              (prev, guildCount) => prev + guildCount,
+              0
+            );
+          });
       } else {
-        console.log(response)
+        guildSize = this.client.guilds.cache.size;
+      }
+    } else {
+      if (sharding == true) {
+        await this.client.shard
+          .fetchClientValues("guilds.size")
+          .then(results => {
+            guildSize = results.reduce(
+              (prev, guildCount) => prev + guildCount,
+              0
+            );
+          });
+      } else {
+        guildSize = this.client.guilds.size;
       }
     }
-
-    async autoPost(){
-        console.log("Statcord Auto Post Started")
-        await this.post()
-        
-        setInterval(async function(arg1) {
-          console.log("POSTING")
-            await arg1.post()
-        }, 3600000,this)
+    let userSize = 0;
+    if (ver12) {
+      if (sharding == true) {
+        await this.client.shard
+          .broadcastEval(
+            "this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)"
+          )
+          .then(results => {
+            userSize = results.reduce(
+              (prev, memberCount) => prev + memberCount,
+              0
+            );
+          })
+          .catch(console.error);
+      } else {
+        userSize = this.client.guilds.cache
+          .map(g => g.memberCount)
+          .reduce(function(accumulator, currentValue) {
+            return accumulator + currentValue;
+          }, 0);
+      }
+    } else {
+      if (sharding == true) {
+        await this.client.shard
+          .broadcastEval(
+            "this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)"
+          )
+          .then(results => {
+            userSize = results.reduce(
+              (prev, memberCount) => prev + memberCount,
+              0
+            );
+          })
+          .catch(console.error);
+      } else {
+        userSize = this.client.guilds
+          .map(g => g.memberCount)
+          .reduce(function(accumulator, currentValue) {
+            return accumulator + currentValue;
+          }, 0);
+      }
     }
+    let popular = [];
+    let array = this.popular.sort(function(a, b) {
+      return b.count - a.count;
+    });
+    for (const data of array) {
+      if (array[0] === data || array[1] === data || array[2] === data) {
+        popular.push({
+          name: data.name,
+          count: data.count.toString()
+        });
+      } else continue;
+    }
+    let body = {
+      id: this.client.user.id,
+      key: this.key,
+      servers: guildSize.toString(),
+      users: userSize.toString(),
+      active: this.active.length.toString(),
+      commands: this.commands.toString(),
+      popular: popular
+    };
+    let response;
+    await fetch(this.baseURL, {
+      method: "post",
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" }
+    })
+      .then(res => {
+        response = {
+          message: res.statusText,
+          statusCode: res.status
+        };
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    this.active = [];
+    this.commands = 0;
+    this.popular = [];
+
+    if (response.statusCode === 200) {
+      console.log(response);
+    } else {
+      console.log(response);
+    }
+  }
+
+  async autoPost() {
+    console.log("Statcord Auto Post Started");
+    await this.post();
+
+    setInterval(
+      async function(arg1) {
+        console.log("POSTING");
+        await arg1.post();
+      },
+      3600000,
+      this
+    );
+  }
+  async postCommand(command, author_id) {
+    console.log('Worked')
+        let sharding;
+    let m;
+    if (this.client.shard) {
+      if(this.client.shard.ids[0] !== 0) m = false
+      sharding = true;
+    } else {
+      sharding = false;
+    }
+    if(sharding === false){
+    if (!command || typeof command != "string")
+      return console.error("You didn't provide enough parameters");
+
+    if (!author_id || typeof author_id != "string")
+      return console.error(
+        "You didn't provide enough parameters! Make sure the author id is a string!"
+      );
+    this.commands = this.commands + 1;
+    if (!this.active.includes(author_id)) this.active.push(author_id);
+    let obj = {
+      name: command,
+      count: 1
+    };
+    if (!this.popular.some(m => m.name === command)) {
+      this.popular.push(obj);
+    } else {
+      let fi = this.popular.find(m => m.name === command);
+      let objIndex = this.popular.findIndex(obj => obj.name == command);
+      this.popular[objIndex].count = fi.count + 1;
+    }
+    } else {
+      if(this.client.shard.ids[0] === 0){
+            if (!command || typeof command != "string")
+      return console.error("You didn't provide enough parameters");
+
+    if (!author_id || typeof author_id != "string")
+      return console.error(
+        "You didn't provide enough parameters! Make sure the author id is a string!"
+      );
+    this.commands = this.commands + 1;
+    if (!this.active.includes(author_id)) this.active.push(author_id);
+    let obj = {
+      name: command,
+      count: 1
+    };
+    if (!this.popular.some(m => m.name === command)) {
+      this.popular.push(obj);
+    } else {
+      let fi = this.popular.find(m => m.name === command);
+      let objIndex = this.popular.findIndex(obj => obj.name == command);
+      this.popular[objIndex].count = fi.count + 1;
+    }
+      } else {
+      this.client.shard.broadcastEval(`if(this.shard.ids[0] !== 0){
+let client = new statcord(\`${this.key}\`, \`${this.client}\`)
+client.postCommand(\`${command}\`, \`${author_id}\`)
+}
+`)  
+      }
+    }
+  }
 }
 
 module.exports = Statcord;
