@@ -21,10 +21,8 @@ class Statcord {
   async post() {
     if (require('discord.js').version >= '12.0.0') {
       this.ver12 = true
-      console.log('You are in v12 discord.js')
     } else {
       this.ver12 = false
-      console.log('You are not in v12 discord.js')
     }
         if (this.client.shard) {
       if(this.ver12 === true){
@@ -182,10 +180,8 @@ await array.push(member.id)
   async postCommand(command, author_id) {
     if (require('discord.js').version >= '12.0.0') {
       this.ver12 = true
-      console.log('You are in v12 discord.js')
     } else {
       this.ver12 = false
-      console.log('You are not in v12 discord.js')
     }
         if (this.client.shard) {
       if(this.ver12 === true){
