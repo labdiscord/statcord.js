@@ -24,27 +24,17 @@ npm i statcord.js
 
 ## Example Discord.js Setup
 
-### Posting Server & User Count
-```js
-let Discord = require('discord.js')
-let client = new Discord.Client()
-let statcord = require('statcord.js')
-
-client.on('ready', async () => {
-let statclient = new statcord("statcord.com-AddYourKeyHere", client)
-  await statclient.autoPost()
-})
-
-client.login("YourDiscordBotTokenHere")
-```
-
-### Posting commands
+### Posting user & servers count, popular commands and active users
 ```js
 let Discord = require('discord.js')
 let client = new Discord.Client()
 let statcord = require('statcord.js')
 let statclient = new statcord("statcord.com-AddYourKeyHere", client)
 const prefix = 'YourPrefix'
+
+client.on('ready', async() => {
+await statclient.autoPost()
+})
 
 client.on('message', message => {
   const args = message.content.slice(prefix.length).trim().split(/ +/g);
