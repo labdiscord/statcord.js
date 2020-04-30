@@ -185,9 +185,17 @@ await array.push(member.id)
     }
         if (this.client.shard) {
       if(this.ver12 === true){
-      if(this.client.shard.ids[0] !== 0) this.shard_id = true
+      if(this.client.shard.ids[0] !== 0) {
+      this.shard_id = true
       } else {
-        if(this.client.shard.id !== 0) this.shard_id = true
+      this.shard_id = false
+      }
+      } else {
+        if(this.client.shard.id !== 0){
+      this.shard_id = true
+      } else {
+      this.shard_id = false
+      }
       }
       this.sharding = true;
     } else {
