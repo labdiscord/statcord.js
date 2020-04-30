@@ -206,6 +206,7 @@ await array.push(member.id)
       return console.error(
         "You didn't provide enough parameters! Make sure the author id is a string!"
       );
+console.log({command: command, author_id: author_id})
     this.commands = this.commands + 1;
     if (!this.active.includes(author_id)) this.active.push(author_id);
     let obj = {
@@ -228,6 +229,7 @@ await array.push(member.id)
       return console.error(
         "You didn't provide enough parameters! Make sure the author id is a string!"
       );
+console.log({command: command, author_id: author_id})
     this.commands = this.commands + 1;
     if (!this.active.includes(author_id)) this.active.push(author_id);
     let obj = {
@@ -245,11 +247,11 @@ await array.push(member.id)
       this.client.shard.broadcastEval(`
 let m = ${this.shard_id}
 if(m === true){
-const statcord = require('statcord.js-beta')
+const statcord = require('statcord.js')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
 }
-`)  
+`)
       }
     }
   }
