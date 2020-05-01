@@ -24,19 +24,34 @@ npm i statcord.js
 
 ## Example Discord.js Setup
 
-### Posting Server & User Count
+### Posting user & servers count, popular commands and active users
 ```js
 let Discord = require('discord.js')
 let client = new Discord.Client()
 let statcord = require('statcord.js')
 let statclient = new statcord("statcord.com-AddYourKeyHere", client)
- 
-client.on('ready', async () => {
-  await statclient.autoPost()
+const prefix = 'YourPrefix'
+
+client.on('ready', async() => {
+await statclient.autoPost()
 })
- 
+
+client.on('message', message => {
+  const args = message.content.slice(prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+  if(command === 'ping'){
+    statclient.postCommand(command, message.author.id)
+    message.channel.send('Pong!')
+  }
+})
+
 client.login("YourDiscordBotTokenHere")
 ```
+
+## Caution for Sharding Bots
+
+If you are using sharding in your bot, make sure you use the constructor (`let statclient = new statcord("statcord.com-AddYourKeyHere", client)`) for statClient only after all shards are spawned. If not, you will be resulted an error.
+
 
 ## Contributing
 
