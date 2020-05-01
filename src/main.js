@@ -249,8 +249,13 @@ console.log({command: command, author_id: author_id})
     }
       } else {
       this.client.shard.broadcastEval(`
-let m = ${this.shard_id}
-if(m === true){
+let n;
+if(${this.ver12} === true){
+n = this.shard.ids[0]
+} else{
+n = this.shard.id
+}
+if(n === 0){
 const statcord = require('statcord.js')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
