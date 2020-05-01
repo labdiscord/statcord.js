@@ -10,7 +10,7 @@ class Statcord {
       console.error(
         "You have provided an item that is not a object. Please replace the item (statcord-api)"
       );
-    this.baseURL = "https://beta.statcord.com/mason/stats";
+    this.baseURL = "https://statcord.com/mason/stats";
     this.key = KEY;
     this.client = CLIENT;
     this.active = [];
@@ -251,7 +251,7 @@ console.log({command: command, author_id: author_id})
       this.client.shard.broadcastEval(`
 let m = ${this.shard_id}
 if(m === true){
-const statcord = require('statcord.js-beta')
+const statcord = require('statcord.js')
 let client = new statcord(\`${this.key}\`, \`${this.client}\`)
 client.postCommand(\`${command}\`, \`${author_id}\`)
 }
