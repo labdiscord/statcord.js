@@ -67,55 +67,23 @@ class Statcord {
     let userSize = 0;
     if (this.ver12 === true) {
       if (this.sharding == true) {
-await this.client.shard.broadcastEval(`
-let array = []
-for(const data of this.guilds.cache.array()){
-for(const member of data.members.cache.array()){
-if(array.includes(member.id)) continue;
-array.push(member.id)
-}
-}
-array.length
-`).then(re => {
+await this.client.shard.fetchClientValues(`users.cache.size`).then(re => {
 for(const data of re){
   userSize = userSize + data
 }
 }).catch(err => console.log(err))
       } else {
-let array = []
-for(const data of this.client.guilds.cache.array()){
-  for(const member of data.members.cache.array()){
-if(array.includes(member.id)) continue;
-await array.push(member.id)
-}
-}
-        userSize = array.length
+userSize = await this.client.users.cache.size
       }
     } else {
       if (this.sharding == true) {
-await this.client.shard.broadcastEval(`
-let array = []
-for(const data of this.guilds.array()){
-for(const member of data.members.array()){
-if(array.includes(member.id)) continue;
-array.push(member.id)
-}
-}
-array.length
-`).then(re => {
+await this.client.shard.fetchClientValues(`users.size`).then(re => {
 for(const data of re){
   userSize = userSize + data
 }
 }).catch(err => console.log(err))
       } else {
-let array = []
-for(const data of this.client.guilds.array()){
-  for(const member of data.members.array()){
-if(array.includes(member.id)) continue;
-await array.push(member.id)
-}
-}
-        userSize = array.length
+userSize = await this.client.users.size
       }
     }
     let popular = [];
