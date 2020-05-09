@@ -178,7 +178,7 @@ class Statcord {
         return console.error(
           "You didn't provide enough parameters! Make sure the author id is a string!"
         );
-      console.log({ command: command, author_id: author_id })
+
       this.commands = this.commands + 1;
       if (!this.active.includes(author_id)) this.active.push(author_id);
       let obj = {
