@@ -24,18 +24,18 @@ class Statcord {
     } else {
       this.ver12 = false
     }
-        if (this.client.shard) {
-      if(this.ver12 === true){
-      if(this.client.shard.ids[0] !== 0) this.shard_id = true
+    if (this.client.shard) {
+      if (this.ver12 === true) {
+        if (this.client.shard.ids[0] !== 0) this.shard_id = true
       } else {
-        if(this.client.shard.id !== 0) this.shard_id = true
+        if (this.client.shard.id !== 0) this.shard_id = true
       }
       this.sharding = true;
     } else {
       this.sharding = false;
       this.shard_id = false
     }
-    if(this.shard_id === true) return;
+    if (this.shard_id === true) return;
     let guildSize = 0;
     if (this.ver12 === true) {
       if (this.sharding == true) {
@@ -67,27 +67,27 @@ class Statcord {
     let userSize = 0;
     if (this.ver12 === true) {
       if (this.sharding == true) {
-await this.client.shard.fetchClientValues(`users.cache.size`).then(re => {
-for(const data of re){
-  userSize = userSize + data
-}
-}).catch(err => console.log(err))
+        await this.client.shard.fetchClientValues(`users.cache.size`).then(re => {
+          for (const data of re) {
+            userSize = userSize + data
+          }
+        }).catch(err => console.log(err))
       } else {
-userSize = await this.client.users.cache.size
+        userSize = await this.client.users.cache.size
       }
     } else {
       if (this.sharding == true) {
-await this.client.shard.fetchClientValues(`users.size`).then(re => {
-for(const data of re){
-  userSize = userSize + data
-}
-}).catch(err => console.log(err))
+        await this.client.shard.fetchClientValues(`users.size`).then(re => {
+          for (const data of re) {
+            userSize = userSize + data
+          }
+        }).catch(err => console.log(err))
       } else {
-userSize = await this.client.users.size
+        userSize = await this.client.users.size
       }
     }
     let popular = [];
-    let array = this.popular.sort(function(a, b) {
+    let array = this.popular.sort(function (a, b) {
       return b.count - a.count;
     });
     for (const data of array) {
@@ -138,7 +138,7 @@ userSize = await this.client.users.size
     await this.post();
 
     setInterval(
-      async function(arg1) {
+      async function (arg1) {
         await arg1.post();
       },
       3600000,
@@ -151,72 +151,72 @@ userSize = await this.client.users.size
     } else {
       this.ver12 = false
     }
-        if (this.client.shard) {
-      if(this.ver12 === true){
-      if(this.client.shard.ids[0] !== 0) {
-      this.shard_id = true
+    if (this.client.shard) {
+      if (this.ver12 === true) {
+        if (this.client.shard.ids[0] !== 0) {
+          this.shard_id = true
+        } else {
+          this.shard_id = false
+        }
       } else {
-      this.shard_id = false
-      }
-      } else {
-        if(this.client.shard.id !== 0){
-      this.shard_id = true
-      } else {
-      this.shard_id = false
-      }
+        if (this.client.shard.id !== 0) {
+          this.shard_id = true
+        } else {
+          this.shard_id = false
+        }
       }
       this.sharding = true;
     } else {
       this.sharding = false;
       this.shard_id = false
     }
-    if(this.sharding === false){
-    if (!command || typeof command != "string")
-      return console.error("You didn't provide enough parameters");
+    if (this.sharding === false) {
+      if (!command || typeof command != "string")
+        return console.error("You didn't provide enough parameters");
 
-    if (!author_id || typeof author_id != "string")
-      return console.error(
-        "You didn't provide enough parameters! Make sure the author id is a string!"
-      );
-console.log({command: command, author_id: author_id})
-    this.commands = this.commands + 1;
-    if (!this.active.includes(author_id)) this.active.push(author_id);
-    let obj = {
-      name: command,
-      count: 1
-    };
-    if (!this.popular.some(m => m.name === command)) {
-      this.popular.push(obj);
-    } else {
-      let fi = this.popular.find(m => m.name === command);
-      let objIndex = this.popular.findIndex(obj => obj.name == command);
-      this.popular[objIndex].count = fi.count + 1;
-    }
-    } else {
-      if(this.shard_id === false){
-            if (!command || typeof command != "string")
-      return console.error("You didn't provide enough parameters");
-
-    if (!author_id || typeof author_id != "string")
-      return console.error(
-        "You didn't provide enough parameters! Make sure the author id is a string!"
-      );
-console.log({command: command, author_id: author_id})
-    this.commands = this.commands + 1;
-    if (!this.active.includes(author_id)) this.active.push(author_id);
-    let obj = {
-      name: command,
-      count: 1
-    };
-    if (!this.popular.some(m => m.name === command)) {
-      this.popular.push(obj);
-    } else {
-      let fi = this.popular.find(m => m.name === command);
-      let objIndex = this.popular.findIndex(obj => obj.name == command);
-      this.popular[objIndex].count = fi.count + 1;
-    }
+      if (!author_id || typeof author_id != "string")
+        return console.error(
+          "You didn't provide enough parameters! Make sure the author id is a string!"
+        );
+      console.log({ command: command, author_id: author_id })
+      this.commands = this.commands + 1;
+      if (!this.active.includes(author_id)) this.active.push(author_id);
+      let obj = {
+        name: command,
+        count: 1
+      };
+      if (!this.popular.some(m => m.name === command)) {
+        this.popular.push(obj);
       } else {
-      this.client.shard.broadcastEval(`
+        let fi = this.popular.find(m => m.name === command);
+        let objIndex = this.popular.findIndex(obj => obj.name == command);
+        this.popular[objIndex].count = fi.count + 1;
+      }
+    } else {
+      if (this.shard_id === false) {
+        if (!command || typeof command != "string")
+          return console.error("You didn't provide enough parameters");
+
+        if (!author_id || typeof author_id != "string")
+          return console.error(
+            "You didn't provide enough parameters! Make sure the author id is a string!"
+          );
+        console.log({ command: command, author_id: author_id })
+        this.commands = this.commands + 1;
+        if (!this.active.includes(author_id)) this.active.push(author_id);
+        let obj = {
+          name: command,
+          count: 1
+        };
+        if (!this.popular.some(m => m.name === command)) {
+          this.popular.push(obj);
+        } else {
+          let fi = this.popular.find(m => m.name === command);
+          let objIndex = this.popular.findIndex(obj => obj.name == command);
+          this.popular[objIndex].count = fi.count + 1;
+        }
+      } else {
+        this.client.shard.broadcastEval(`
 let n;
 if(${this.ver12} === true){
 n = this.shard.ids[0]

@@ -26,31 +26,31 @@ npm i statcord.js
 
 ### Posting user & servers count, popular commands and active users
 ```js
-let Discord = require('discord.js')
-let client = new Discord.Client()
-let statcord = require('statcord.js')
-let statclient = new statcord("statcord.com-AddYourKeyHere", client)
-const prefix = 'YourPrefix'
+const Discord = require('discord.js');
+const client = new Discord.Client();
+const statcord = require('statcord.js');
+const statclient = new statcord("statcord.com-AddYourKeyHere", client);
+const prefix = 'YourPrefix';
 
 client.on('ready', async() => {
-await statclient.autoPost()
+  await statclient.autoPost()
 })
 
 client.on('message', message => {
   const args = message.content.slice(prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
   if(command === 'ping'){
-    statclient.postCommand(command, message.author.id)
-    message.channel.send('Pong!')
+    statclient.postCommand(command, message.author.id);
+    message.channel.send('Pong!');
   }
 })
 
-client.login("YourDiscordBotTokenHere")
+client.login("YourDiscordBotTokenHere")'
 ```
 
 ## Caution for Sharding Bots
 
-If you are using sharding in your bot, make sure you use the constructor (`let statclient = new statcord("statcord.com-AddYourKeyHere", client)`) for statClient only after all shards are spawned. If not, you will be resulted an error.
+If you are using sharding in your bot, make sure you use the constructor (`const statclient = new statcord("statcord.com-AddYourKeyHere", client)`) for statClient only after all shards are spawned. If not, you will be resulted an error.
 
 
 ## Contributing
