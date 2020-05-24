@@ -62,7 +62,7 @@ When you are ready, simply create a pull request for your contribution and we wi
 
 ### Donating
 
-You can also help me and the project out by sponsoring me through a [donation on PayPal](http://paypal.me/deltafloof).
+You can also help me and the project out by sponsoring me through a [donation on PayPal](http://paypal.me/labdiscord).
 
 
 ## Discussion, Support and Issues
