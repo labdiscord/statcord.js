@@ -10,7 +10,7 @@ class Statcord {
       console.error(
         "You have provided an item that is not a object. Please replace the item (statcord-api)"
       );
-    this.baseURL = "https://statcord.com/mason/stats";
+    this.baseURL = "https://beta.statcord.com/mason/stats";
     this.key = KEY;
     this.client = CLIENT;
     this.active = [];
