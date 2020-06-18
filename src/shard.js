@@ -202,7 +202,8 @@ async function getGuildCountV12(manager) {
 }
 
 async function getUserCountV12(manager) {
-    return (await manager.fetchClientValues("users.cache.size")).reduce((prev, current) => prev + current, 0);
+    const memberNum = await manager.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)');
+    return memberNum.reduce((prev, memberCount) => prev + memberCount, 0);
 }
 // end
 
