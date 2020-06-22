@@ -1,26 +1,25 @@
 {
   "name": "statcord.js",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Upload Statcord info to the official API!",
   "main": "src/main.js",
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/labdiscord/statcord.js"
-  },
   "keywords": [
     "api",
     "discord-labs",
     "statcord.js",
     "bot-stats"
   ],
-  "author": "Statcord.com",
+  "author": "statcord.com",
   "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "discord.js": "^12.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/labdiscord/statcord.js"
+  },
   "homepage": "https://github.com/labdiscord/statcord.js"
 }
