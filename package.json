@@ -2,7 +2,7 @@
   "name": "statcord.js",
   "version": "2.2.0",
   "description": "Upload Statcord info to the official API!",
-  "main": "src/main.js",
+  "main": "src/index.js",
   "keywords": [
     "api",
     "discord-labs",
