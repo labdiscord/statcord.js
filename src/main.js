@@ -145,7 +145,7 @@ class Statcord {
             async () => {
                 await this.post(); // post once every hour
             },
-            3600000
+            60000
         );
 
         // resolve with initial errors
