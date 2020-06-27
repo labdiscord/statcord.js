@@ -6,11 +6,18 @@ const fetch = require("node-fetch");
  */
 class Statcord {
     /**
-     * Non sharding client
-     * @param {string} key - your statcord key prefix by "statcord.com-""
-     * @param {*} client - your discord.js client object
+     * @typedef {Object} ClientOptions
+     * @property {string} key - your statcord key prefix by "statcord.com-""
+     * @property {*} client - your discord.js client
      */
-    constructor(key, client) {
+
+    /**
+     * Non sharding client
+     * @param {ClientOptions} options
+     */
+    constructor(options) {
+        const { key, client } = options;
+
         // Check for discord.js
         try {
             this.discord = require("discord.js");

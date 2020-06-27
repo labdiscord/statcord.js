@@ -5,12 +5,19 @@ const fetch = require("node-fetch");
  * @class ShardingClient
  */
 class ShardingClient {
+        /**
+     * @typedef {Object} ShardingClientOptions
+     * @property {string} key - your statcord key prefix by "statcord.com-""
+     * @property {*} manager - your discord.js shardingmanager
+     */
+
     /**
      * Sharding client
-     * @param {string} key - your statcord key prefix by "statcord.com-""
-     * @param {*} client - your discord.js shardingmanager object
+     * @param {ShardingClientOptions} options
      */
-    constructor(key, manager) {
+    constructor(options) {
+        const { key, manager } = options;
+
         // Check for discord.js
         try {
             this.discord = require("discord.js");
