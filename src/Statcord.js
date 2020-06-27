@@ -27,7 +27,7 @@ class Statcord {
         if (!(client instanceof this.discord.Client)) throw new TypeError('"client" is not a discord.js client');
 
         // API config
-        this.baseApiUrl = "https://beta.statcord.com/mason/stats";
+        this.baseApiUrl = "https://statcord.com/mason/stats";
         this.key = key;
         this.client = client;
 
