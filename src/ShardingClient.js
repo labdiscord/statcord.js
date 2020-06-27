@@ -52,7 +52,7 @@ class ShardingClient {
 
                         setInterval(async () => {
                             await this.post();
-                        }, 3600000);
+                        }, 60000);
                     }, 200);
                 });
             }
