@@ -219,7 +219,7 @@ async function getUserCountV11(manager) {
 
 module.exports = ShardingClient;
 
-const ShardingUtil = require("./shardUtil");
+const ShardingUtil = require("./util/shardUtil");
 
 module.exports.postCommand = ShardingUtil.postCommand;
 module.exports.post = ShardingUtil.post;
