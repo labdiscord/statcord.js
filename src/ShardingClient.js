@@ -9,6 +9,8 @@ class ShardingClient {
      * @typedef {Object} ShardingClientOptions
      * @property {string} key - your statcord key prefix by "statcord.com-""
      * @property {*} manager - your discord.js shardingmanager
+     * @property {boolean} [postCpuStatistics=true] - Whether you want to post CPU usage
+     * @property {boolean} [postMemStatistics=true] - Whether you want to post mem usage
      */
 
     /**
@@ -17,6 +19,7 @@ class ShardingClient {
      */
     constructor(options) {
         const { key, manager } = options;
+        let { postCpuStatistics, postMemStatistics } = options;
 
         // Check for discord.js
         try {
@@ -32,6 +35,11 @@ class ShardingClient {
         // Manager error handling
         if (!manager) throw new Error('"manager" is missing or undefined');
         if (!(manager instanceof this.discord.ShardingManager)) throw new TypeError('"manager" is not a discord.js sharding manager');
+        // Post arg error checking
+        if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
+        if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
+        if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
+        if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
 
         // API config
         this.baseApiUrl = "https://statcord.com/mason/stats";
@@ -45,6 +53,10 @@ class ShardingClient {
         this.commandsRun = 0;
         this.popularCommands = [];
 
+        // Opt ins
+        this.postCpuStatistics = postCpuStatistics;
+        this.postMemStatistics = postMemStatistics;
+        
         // Check if all shards have been spawned
         this.manager.on("shardCreate", (shard) => {
             // Get current shard
@@ -117,6 +129,32 @@ class ShardingClient {
         // Limit popular to the 5 most popular
         if (popular.length > 5) popular.length = 5;
 
+        // Get system information
+        let memactive = 0;
+        let memload = 0;
+        let cpuload = 0;
+        let cputemp = 0;
+
+        if (this.postMemStatistics) {
+            const mem = await si.mem();
+
+            memactive = Math.round(mem.active / 1000000);; // TODO convert to megabytes
+            memload = Math.fround(mem.active / mem.total * 100);
+        }
+
+        if (this.postCpuStatistics) {
+            const platform = require("os").platform();
+
+            if (platform !== "freebsd" && platform !== "netbsd" && platform !== "openbsd") {
+                const load = await si.currentLoad();
+
+                cpuload = Math.round(load.currentload);
+            }
+
+            // TODO issues with temperature readouts in systeminformation - temp cannot be done just yet
+            // TODO discovered fix, waitinf for approval
+        }
+
         // Get client id
         let id = (await this.manager.broadcastEval("this.user.id"))[0];
 
@@ -128,7 +166,11 @@ class ShardingClient {
             users: user_count.toString(), // User count
             active: this.activeUsers.length.toString(), // Users that have run commands since the last post
             commands: this.commandsRun.toString(), // The how many commands have been run total
-            popular // the top 5 commands run and how many times they have been run
+            popular, // the top 5 commands run and how many times they have been run
+            memactive,
+            memload,
+            cpuload,
+            cputemp
         }
 
         // Reset stats
