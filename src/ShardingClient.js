@@ -139,7 +139,7 @@ class ShardingClient {
         });
 
         // Statcord server side errors
-        if (response.status > 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
 
         // Get body as JSON
         let responseData = await response.json();
