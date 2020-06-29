@@ -126,7 +126,7 @@ class Statcord {
             // Get active memory in MB
             memactive = Math.round(mem.active / 1000000);
             // Get active mem load in %
-            memload = Math.fround(mem.active / mem.total * 100);
+            memload = Math.round(mem.active / mem.total * 100);
         }
 
         // Get cpu stats
@@ -157,10 +157,10 @@ class Statcord {
             active: this.activeUsers.length.toString(), // Users that have run commands since the last post
             commands: this.commandsRun.toString(), // The how many commands have been run total
             popular, // the top 5 commands run and how many times they have been run
-            memactive, // Actively used memory
-            memload, // Active memory load in %
-            cpuload, // CPU load in %
-            cputemp, // CPU temp in deg celcius
+            memactive: memactive.toString(), // Actively used memory
+            memload: memload.toString(), // Active memory load in %
+            cpuload: cpuload.toString(), // CPU load in %
+            cputemp: cputemp.toString(), // CPU temp in deg celcius
             custom1: "", // Custom field 1
             custom2: "" // Custom field 2
         }
@@ -172,14 +172,14 @@ class Statcord {
 
         // Get custom field two value
         if (this.customFields.get(2)) {
-            requestBody.custom1 = await this.customFields.get(2)(this.client);
+            requestBody.custom2 = await this.customFields.get(2)(this.client);
         }
 
         // Reset stats
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
-
+        
         // Create post request
         let response = await fetch(this.baseApiUrl, {
             method: "post",

@@ -1,5 +1,6 @@
 // Modules
 const fetch = require("node-fetch");
+const si = require("systeminformation");
 
 /**
  * @class ShardingClient
@@ -9,6 +10,7 @@ class ShardingClient {
      * @typedef {Object} ShardingClientOptions
      * @property {string} key - your statcord key prefix by "statcord.com-""
      * @property {*} manager - your discord.js shardingmanager
+     * @property {boolean} autopost - whether to autopost or not
      * @property {boolean} [postCpuStatistics=true] - Whether you want to post CPU usage
      * @property {boolean} [postMemStatistics=true] - Whether you want to post mem usage
      */
@@ -23,7 +25,7 @@ class ShardingClient {
      */
     constructor(options) {
         const { key, manager } = options;
-        let { postCpuStatistics, postMemStatistics } = options;
+        let { postCpuStatistics, postMemStatistics, autopost } = options;
 
         // Check for discord.js
         try {
@@ -39,6 +41,9 @@ class ShardingClient {
         // Manager error handling
         if (!manager) throw new Error('"manager" is missing or undefined');
         if (!(manager instanceof this.discord.ShardingManager)) throw new TypeError('"manager" is not a discord.js sharding manager');
+        // Auto post arg checking
+        if (!autopost == null || autopost == undefined) autopost = true;
+        if (typeof autopost !== "boolean") throw new TypeError('"autopost" is not of type boolean');
         // Post arg error checking
         if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
         if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
@@ -74,11 +79,13 @@ class ShardingClient {
             let currShard = this.manager.shards.get(shard.id);
 
             // If this is the last shard, wait until it is ready
-            if (shard.id + 1 == this.manager.totalShards) {
+            if (shard.id + 1 == this.manager.totalShards && autopost) {
                 // When ready start auto post
                 currShard.once("ready", () => {
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         console.log("Starting autopost");
+
+                        await this.post();
 
                         setInterval(async () => {
                             await this.post();
@@ -153,7 +160,7 @@ class ShardingClient {
             // Get active memory in MB
             memactive = Math.round(mem.active / 1000000);
             // Get active mem load in %
-            memload = Math.fround(mem.active / mem.total * 100);
+            memload = Math.round(mem.active / mem.total * 100);
         }
 
         // Get cpu stats
@@ -187,10 +194,10 @@ class ShardingClient {
             active: this.activeUsers.length.toString(), // Users that have run commands since the last post
             commands: this.commandsRun.toString(), // The how many commands have been run total
             popular, // the top 5 commands run and how many times they have been run
-            memactive, // Actively used memory
-            memload, // Active memory load in %
-            cpuload, // CPU load in %
-            cputemp, // CPU temp in deg celcius
+            memactive: memactive.toString(), // Actively used memory
+            memload: memload.toString(), // Active memory load in %
+            cpuload: cpuload.toString(), // CPU load in %
+            cputemp: cputemp.toString(), // CPU temp in deg celcius
             custom1: "", // Custom field 1
             custom2: "" // Custom field 2
         }
@@ -202,8 +209,8 @@ class ShardingClient {
 
         // Get custom field two value
         if (this.customFields.get(2)) {
-            requestBody.custom1 = await this.customFields.get(2)(this.manager);
-        }        
+            requestBody.custom2 = await this.customFields.get(2)(this.manager);
+        }     
 
         // Reset stats
         this.activeUsers = [];
@@ -315,6 +322,7 @@ async function getUserCountV11(manager) {
 module.exports = ShardingClient;
 
 const ShardingUtil = require("./util/shardUtil");
+const { cpu } = require("systeminformation");
 
 module.exports.postCommand = ShardingUtil.postCommand;
 module.exports.post = ShardingUtil.post;
