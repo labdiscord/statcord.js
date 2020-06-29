@@ -5,10 +5,14 @@ const fetch = require("node-fetch");
  * @class ShardingClient
  */
 class ShardingClient {
-        /**
+    /**
      * @typedef {Object} ShardingClientOptions
      * @property {string} key - your statcord key prefix by "statcord.com-""
      * @property {*} manager - your discord.js shardingmanager
+     */
+
+    /**
+     * @typedef {import("discord.js").ShardingManager} ShardingManager
      */
 
     /**
@@ -34,7 +38,7 @@ class ShardingClient {
         if (!(manager instanceof this.discord.ShardingManager)) throw new TypeError('"manager" is not a discord.js sharding manager');
 
         // API config
-        this.baseApiUrl = "https://statcord.com/mason/stats";
+        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; //TODO update before full release
         this.key = key;
         this.manager = manager;
 
@@ -44,6 +48,13 @@ class ShardingClient {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
+
+        /**
+         * Create custom fields map
+         * @type {Map<1 | 2, (manager: ShardingManager) => Promise<string>> }
+         * @private
+         */
+        this.customFields = new Map();
 
         // Check if all shards have been spawned
         this.manager.on("shardCreate", (shard) => {
@@ -131,6 +142,16 @@ class ShardingClient {
             popular // the top 5 commands run and how many times they have been run
         }
 
+        // Get custom field one value
+        if (this.customFields.get(1)) {
+            requestBody.custom1 = await this.customFields.get(1)(this.manager);
+        }
+
+        // Get custom field two value
+        if (this.customFields.get(2)) {
+            requestBody.custom1 = await this.customFields.get(2)(this.manager);
+        }        
+
         // Reset stats
         this.activeUsers = [];
         this.commandsRun = 0;
@@ -146,7 +167,7 @@ class ShardingClient {
         });
 
         // Statcord server side errors
-        if (response.status > 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
 
         // Get body as JSON
         let responseData = await response.json();
@@ -200,6 +221,18 @@ class ShardingClient {
 
         // Increment the commandsRun variable
         this.commandsRun++;
+    }
+
+    /**
+     * Register the function to get the values for posting
+     * @param {1 | 2} customFieldNumber - Whether the handler is for customField1 or customField2 
+     * @param {(manager: ShardingManager) => Promise<string>} handler - Your function to get
+     * @returns {Error | null}
+     */
+    async registerCustomFieldHandler(customFieldNumber, handler) {
+        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+
+        this.customFields.set(customFieldNumber, handler);
     }
 }
 

@@ -11,6 +11,10 @@ class Statcord {
      * @property {*} client - your discord.js client
      */
 
+     /**
+      * @typedef {import("discord.js").Client} Client
+      */
+
     /**
      * Non sharding client
      * @param {ClientOptions} options
@@ -34,7 +38,7 @@ class Statcord {
         if (!(client instanceof this.discord.Client)) throw new TypeError('"client" is not a discord.js client');
 
         // API config
-        this.baseApiUrl = "https://statcord.com/mason/stats";
+        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; // TODO update for full release
         this.key = key;
         this.client = client;
 
@@ -44,6 +48,13 @@ class Statcord {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
+
+        /**
+         * Create custom fields map
+         * @type {Map<1 | 2, (client: Client) => Promise<string>> }
+         * @private
+         */
+        this.customFields = new Map();
 
         // Check for sharding
         if (this.client.shard) {
@@ -100,6 +111,16 @@ class Statcord {
             popular // the top 5 commands run and how many times they have been run
         }
 
+        // Get custom field one value
+        if (this.customFields.get(1)) {
+            requestBody.custom1 = await this.customFields.get(1)(this.client);
+        }
+
+        // Get custom field two value
+        if (this.customFields.get(2)) {
+            requestBody.custom1 = await this.customFields.get(2)(this.client);
+        }
+
         // Reset stats
         this.activeUsers = [];
         this.commandsRun = 0;
@@ -115,7 +136,7 @@ class Statcord {
         });
 
         // Server error on statcord
-        if (response.status > 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
 
         // Get body as JSON
         let responseData = await response.json();
@@ -194,6 +215,18 @@ class Statcord {
 
         // Increment the commandsRun variable
         this.commandsRun++;
+    }
+
+    /**
+     * Register the function to get the values for posting
+     * @param {1 | 2} customFieldNumber - Whether the handler is for customField1 or customField2 
+     * @param {(client: Client) => Promise<string>} handler - Your function to get
+     * @returns {Error | null}
+     */
+    async registerCustomFieldHandler(customFieldNumber, handler) {
+        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+
+        this.customFields.set(customFieldNumber, handler);
     }
 }
 
