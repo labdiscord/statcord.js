@@ -125,7 +125,7 @@ class Statcord {
             if (responseData.error) return Promise.resolve(new Error(responseData.message));
         } else {
             // Other
-            return Promise.resolve(new Error("An unkown error has occurred"));
+            return Promise.resolve(new Error("An unknown error has occurred"));
         }
     }
 
