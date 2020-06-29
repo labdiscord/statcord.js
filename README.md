@@ -7,14 +7,18 @@
     -   [autopost][3]
     -   [postCommand][4]
         -   [Parameters][5]
--   [ShardingClient][6]
-    -   [postCommand][7]
-        -   [Parameters][8]
-    -   [post][9]
+    -   [registerCustomFieldHandler][6]
+        -   [Parameters][7]
+-   [ShardingClient][8]
+    -   [registerCustomFieldHandler][9]
         -   [Parameters][10]
--   [Examples][15]
-    -   [Normal Usage][16]
-    -   [Sharding Usage][17]
+    -   [postCommand][11]
+        -   [Parameters][12]
+    -   [post][13]
+        -   [Parameters][14]
+-   [Examples][19]
+    -   [Normal Usage][20]
+    -   [Sharding Usage][21]
 
 ## Statcord
 
@@ -22,13 +26,13 @@
 
 Manual posting
 
-Returns **[Promise][11]&lt;([boolean][12] \| [Error][13])>** returns false if there was no error, returns an error if there was.
+Returns **[Promise][15]&lt;([boolean][16] \| [Error][17])>** returns false if there was no error, returns an error if there was.
 
 ### autopost
 
 Auto posting
 
-Returns **[Promise][11]&lt;([boolean][12] \| [Error][13])>** returns false if there was no error, returns an error if there was. Only on the first run, otherwise the rest will be ignored
+Returns **[Promise][15]&lt;([boolean][16] \| [Error][17])>** returns false if there was no error, returns an error if there was. Only on the first run, otherwise the rest will be ignored
 
 ### postCommand
 
@@ -36,12 +40,32 @@ Post stats about a command
 
 #### Parameters
 
--   `command_name` **[string][14]** The name of the command that was run
--   `author_id` **[string][14]** The id of the user that ran the command
+-   `command_name` **[string][18]** The name of the command that was run
+-   `author_id` **[string][18]** The id of the user that ran the command
+
+### registerCustomFieldHandler
+
+Register the function to get the values for posting
+
+#### Parameters
+
+-   `customFieldNumber` **(`1` \| `2`)** Whether the handler is for customField1 or customField2
+-   `handler`  **[Normal Handler][23]**
+
+Returns **([Error][17] | null)** 
 
 ## ShardingClient
 
-> **NB**: The ShardingClient always has autopost enabled
+### registerCustomFieldHandler
+
+Register the function to get the values for posting
+
+#### Parameters
+
+-   `customFieldNumber` **(`1` \| `2`)** Whether the handler is for customField1 or customField2
+-   `handler`  **[Sharding Handler][24]**
+
+Returns **([Error][17] | null)** 
 
 ### postCommand
 
@@ -49,8 +73,8 @@ Post stats about a command
 
 #### Parameters
 
--   `command_name` **[string][14]** The name of the command that was run
--   `author_id` **[string][14]** The id of the user that ran the command
+-   `command_name` **[string][18]** The name of the command that was run
+-   `author_id` **[string][18]** The id of the user that ran the command
 -   `client` **any** The discord client this command is being posted for
 
 ### post
@@ -60,6 +84,28 @@ Post all current stats to statcord
 #### Parameters
 
 -   `client` **any** The discord client this command is being posted for
+
+## Handlers
+
+### Normal Handler
+
+Asynchronous function
+
+#### Parameters
+
+- `client` **[Discord.js Client][25]** The client is passed to your function when getting the data
+
+Returns **(Promise<[string][18]>)**
+
+### Sharding Handler
+
+Asynchronous function
+
+#### Parameters
+
+- `manager` **[Discord.js ShardingManager][26]** The manager is passed to your function when getting the data
+
+Returns **(Promise<[string][18]>)**
 
 # Examples
 
@@ -71,7 +117,26 @@ const Discord = require("discord.js");
 
 const client = new Discord.Client();
 // Create statcord client
-const statcord = new Statcord.Client("statcord.com-APIKEY", client);
+const statcord = new Statcord.Client({
+    key: "statcord.com-APIKEY",
+    client,
+    postCpuStatistics: false, /* Whether to post CPU statistics or not, defaults to true */
+    postMemStatistics: false /* Whether to post memory statistics or not, defaults to true */
+});
+
+/* Register custom fields handlers (these are optional, you are not required to use this function)
+ * These functions are automatically run when posting
+*/
+
+// Handler for custom value 1
+statcord.registerCustomFieldHandler(1, async (client) => {
+    // Get and return your data as a string
+});
+
+// Handler for custom value 2
+statcord.registerCustomFieldHandler(2, async (client) => {
+    // Get and return your data as a string
+});
 
 // Client prefix
 const prefix = "cs!";
@@ -131,7 +196,27 @@ client.login("TOKEN");
 
     const manager = new Discord.ShardingManager('./bot.js', { token: "TOKEN"});
     // Create statcord sharding client
-    const statcord = new Statcord.ShardingClient("statcord.com-APIKEY", manager);
+    const statcord = new Statcord.ShardingClient({
+        key: "statcord.com-APIKEY",
+        client,
+        postCpuStatistics: false, /* Whether to post CPU statistics or not, defaults to true */
+        postMemStatistics: false, /* Whether to post memory statistics or not, defaults to true */
+        autopost: false /* Whether to auto post or not, defaults to true */
+    });
+
+    /* Register custom fields handlers (these are optional, you are not required to use this function)
+    * These functions are automatically run when posting
+    */
+
+    // Handler for custom value 1
+    statcord.registerCustomFieldHandler(1, async (manager) => {
+        // Get and return your data as a string
+    });
+
+    // Handler for custom value 2
+    statcord.registerCustomFieldHandler(2, async (manager) => {
+        // Get and return your data as a string
+    });
 
     // Spawn shards, statcord works with both auto and a set amount of shards
     manager.spawn();
@@ -198,26 +283,44 @@ client.login("TOKEN");
 
 [5]: #parameters
 
-[6]: #shardingclient
+[6]: #registercustomfieldhandler
 
-[7]: #postcommand-1
+[7]: #parameters-1
 
-[8]: #parameters-1
+[8]: #shardingclient
 
-[9]: #post-1
+[9]: #registercustomfieldhandler-1
 
 [10]: #parameters-2
 
-[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[11]: #postcommand-1
 
-[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[12]: #parameters-3
 
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[13]: #post-1
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[14]: #parameters-4
 
-[15]: #examples
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[16]: #normal-usage
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[17]: #sharding-usage
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[19]: #examples
+
+[20]: #normal-usage
+
+[21]: #sharding-usage
+
+[22]: #handlers
+
+[23]: #normal-handler
+
+[24]: #sharding-handler
+
+[25]: https://discord.js.org/#/docs/main/stable/class/Client
+
+[26]: https://discord.js.org/#/docs/main/stable/class/ShardingManager
