@@ -146,24 +146,33 @@ class ShardingClient {
         let cpuload = 0;
         let cputemp = 0;
 
+        // Get mem stats
         if (this.postMemStatistics) {
             const mem = await si.mem();
 
-            memactive = Math.round(mem.active / 1000000);; // TODO convert to megabytes
+            // Get active memory in MB
+            memactive = Math.round(mem.active / 1000000);
+            // Get active mem load in %
             memload = Math.fround(mem.active / mem.total * 100);
         }
 
+        // Get cpu stats
         if (this.postCpuStatistics) {
             const platform = require("os").platform();
 
+            // Current load is not avaliable on bsd
             if (platform !== "freebsd" && platform !== "netbsd" && platform !== "openbsd") {
                 const load = await si.currentLoad();
 
+                // Get current load
                 cpuload = Math.round(load.currentload);
             }
 
-            // TODO issues with temperature readouts in systeminformation - temp cannot be done just yet
-            // TODO discovered fix, waitinf for approval
+            // Get cpu temperature
+            const temp = await si.cpuTemperature();
+
+            // The temperature is reported as "-1" if it cant get the actual temp. We need to report 0 if this is the case
+            cputemp = temp.main !== -1 ? temp.main : 0;
         }
 
         // Get client id
@@ -178,10 +187,12 @@ class ShardingClient {
             active: this.activeUsers.length.toString(), // Users that have run commands since the last post
             commands: this.commandsRun.toString(), // The how many commands have been run total
             popular, // the top 5 commands run and how many times they have been run
-            memactive,
-            memload,
-            cpuload,
-            cputemp
+            memactive, // Actively used memory
+            memload, // Active memory load in %
+            cpuload, // CPU load in %
+            cputemp, // CPU temp in deg celcius
+            custom1: "", // Custom field 1
+            custom2: "" // Custom field 2
         }
 
         // Get custom field one value
@@ -272,8 +283,10 @@ class ShardingClient {
      * @returns {Error | null}
      */
     async registerCustomFieldHandler(customFieldNumber, handler) {
+        // Check if the handler already exists
         if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
 
+        // If it doen't set it
         this.customFields.set(customFieldNumber, handler);
     }
 }
