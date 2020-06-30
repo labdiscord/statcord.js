@@ -161,8 +161,8 @@ class Statcord {
             memload: memload.toString(), // Active memory load in %
             cpuload: cpuload.toString(), // CPU load in %
             cputemp: cputemp.toString(), // CPU temp in deg celcius
-            custom1: "", // Custom field 1
-            custom2: "" // Custom field 2
+            custom1: "0", // Custom field 1
+            custom2: "0" // Custom field 2
         }
 
         // Get custom field one value
