@@ -2,3 +2,6 @@
 .env
 .glitch-assets
 shrinkwrap.yaml
+node_modules/
+test/
+old_README.md
