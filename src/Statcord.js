@@ -124,7 +124,7 @@ class Statcord {
             const mem = await si.mem();
 
             // Get active memory in MB
-            memactive = Math.round(mem.active / 1000000);
+            memactive = mem.active;
             // Get active mem load in %
             memload = Math.round(mem.active / mem.total * 100);
         }
