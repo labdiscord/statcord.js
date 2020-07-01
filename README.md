@@ -2,6 +2,7 @@
 
 ### Table of Contents
 
+-   [Issues][27]
 -   [Statcord][1]
     -   [post][2]
     -   [autopost][3]
@@ -19,6 +20,32 @@
 -   [Examples][19]
     -   [Normal Usage][20]
     -   [Sharding Usage][21]
+
+## Issues
+
+> **NB**: To post CPU temperatures correctly with this package the following issues are prevalent
+
+The following information is taken from https://www.npmjs.com/package/systeminformation#known-issues
+
+### In order to report temperatures correctly please ensure you do the following:
+
+#### Mac
+In you project that is using statcord, run the following command:
+```console
+$ npm install osx-temperature-sensor --save
+```
+
+### Linux
+> **NB**: Temperature reporting does **not** work on BSD systems
+
+In some cases you need to install the linux sensors package to be able to measure temperature.
+Example (On Debian systems):
+```console
+$ sudo apt-get install lm-sensors
+```
+
+### Windows
+wmic - which is used to determine temperature sometimes needs to be run with admin privileges. So if you do not get any values, try to run it again with according privileges. If you still do not get any values, your system might not support this feature. In some cases we also discovered that wmic returned incorrect temperature values.
 
 ## Statcord
 
@@ -324,3 +351,5 @@ client.login("TOKEN");
 [25]: https://discord.js.org/#/docs/main/stable/class/Client
 
 [26]: https://discord.js.org/#/docs/main/stable/class/ShardingManager
+
+[27]: #issues
