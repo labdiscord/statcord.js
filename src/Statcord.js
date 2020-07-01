@@ -154,7 +154,7 @@ class Statcord {
             key: this.key, // API key
             servers: guild_count.toString(), // Server count
             users: user_count.toString(), // User count
-            active: this.activeUsers.length.toString(), // Users that have run commands since the last post
+            active: this.activeUsers, // Users that have run commands since the last post
             commands: this.commandsRun.toString(), // The how many commands have been run total
             popular, // the top 5 commands run and how many times they have been run
             memactive: memactive.toString(), // Actively used memory
