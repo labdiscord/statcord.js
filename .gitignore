@@ -1,5 +1,4 @@
 .config/
 .env
 .glitch-assets
-shrinkwrap.yaml
 node_modules/
