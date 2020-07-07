@@ -1,5 +1,5 @@
 {
-  "name": "statcord.js",
+  "name": "statcord.js-beta",
   "version": "3.0.0",
   "description": "Upload Statcord info to the official API!",
   "main": "src/index.js",
