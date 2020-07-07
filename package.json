@@ -1,6 +1,6 @@
 {
-  "name": "statcord.js",
-  "version": "2.2.3",
+  "name": "statcord.j-betas",
+  "version": "2.2.2",
   "description": "Upload Statcord info to the official API!",
   "main": "src/index.js",
   "keywords": [
