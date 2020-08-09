@@ -130,13 +130,19 @@ class ShardingClient {
         this.popularCommands = [];
 
         // Create post request
-        let response = await fetch(this.baseApiUrl, {
-            method: "post",
-            body: JSON.stringify(requestBody),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        let response;
+        try {
+            response = await fetch(this.baseApiUrl, {
+                method: "post",
+                body: JSON.stringify(requestBody),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        } catch (e) {
+            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+            return;
+        }
 
         // Statcord server side errors
         if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
