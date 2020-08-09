@@ -46,6 +46,9 @@ class Statcord {
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
         if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
 
+        // Local config
+        this.autoposting = false;
+
         // API config
         this.baseApiUrl = "https://beta.statcord.com/logan/stats"; // TODO update for full release
         this.key = key;
@@ -181,13 +184,26 @@ class Statcord {
         this.popularCommands = [];
         
         // Create post request
-        let response = await fetch(this.baseApiUrl, {
-            method: "post",
-            body: JSON.stringify(requestBody),
-            headers: {
-                "Content-Type": "application/json"
+        let response;
+        try {
+            response = await fetch(this.baseApiUrl, {
+                method: "post",
+                body: JSON.stringify(requestBody),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        } catch (e) {
+            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+
+            if (!this.autoposting) {
+                setTimeout(() => {
+                    this.post();
+                }, 60000);
             }
-        });
+
+            return;
+        } 
 
         // Server error on statcord
         if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
@@ -234,6 +250,9 @@ class Statcord {
             },
             60000
         );
+
+        // set autoposting var
+        this.autoposting = true;
 
         // resolve with initial errors
         return Promise.resolve(post);
