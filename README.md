@@ -21,31 +21,7 @@
     -   [Normal Usage][20]
     -   [Sharding Usage][21]
 
-## Issues
-
-> **NB**: To post CPU temperatures correctly with this package the following issues are prevalent
-
-The following information is taken from https://www.npmjs.com/package/systeminformation#known-issues
-
 ### In order to report temperatures correctly please ensure you do the following:
-
-#### Mac
-In you project that is using statcord, run the following command:
-```console
-$ npm install osx-temperature-sensor --save
-```
-
-### Linux
-> **NB**: Temperature reporting does **not** work on BSD systems
-
-In some cases you need to install the linux sensors package to be able to measure temperature.
-Example (On Debian systems):
-```console
-$ sudo apt-get install lm-sensors
-```
-
-### Windows
-wmic - which is used to determine temperature sometimes needs to be run with admin privileges. So if you do not get any values, try to run it again with according privileges. If you still do not get any values, your system might not support this feature. In some cases we also discovered that wmic returned incorrect temperature values.
 
 ## Statcord
 
@@ -148,7 +124,8 @@ const statcord = new Statcord.Client({
     key: "statcord.com-APIKEY",
     client,
     postCpuStatistics: false, /* Whether to post CPU statistics or not, defaults to true */
-    postMemStatistics: false /* Whether to post memory statistics or not, defaults to true */
+    postMemStatistics: false, /* Whether to post memory statistics or not, defaults to true */
+    postNetworkStatistics: false /* Whether to post network statistics or not, defaults to true */
 });
 
 /* Register custom fields handlers (these are optional, you are not required to use this function)
@@ -172,13 +149,10 @@ client.on("ready", async () => {
     console.log("ready");
 
     // Start auto posting
-    let initalPost = await statcord.autopost();
+    let initalPostError = await statcord.autopost();
 
     // If there is an error, console.error and exit
-    if (initalPost) {
-        console.error(initalPost);
-        process.exit();
-    }
+    if (initalPostError) console.error(initalPost);
 });
 
 
@@ -228,6 +202,7 @@ client.login("TOKEN");
         client,
         postCpuStatistics: false, /* Whether to post CPU statistics or not, defaults to true */
         postMemStatistics: false, /* Whether to post memory statistics or not, defaults to true */
+        postNetworkStatistics: false, /* Whether to post network statistics or not, defaults to true */
         autopost: false /* Whether to auto post or not, defaults to true */
     });
 

@@ -13,6 +13,7 @@ class ShardingClient {
      * @property {boolean} autopost - whether to autopost or not
      * @property {boolean} [postCpuStatistics=true] - Whether you want to post CPU usage
      * @property {boolean} [postMemStatistics=true] - Whether you want to post mem usage
+     * @property {boolean} [postNetworkStatistics=true] - Whether you want to post mem usage
      */
 
     /**
@@ -25,7 +26,7 @@ class ShardingClient {
      */
     constructor(options) {
         const { key, manager } = options;
-        let { postCpuStatistics, postMemStatistics, autopost } = options;
+        let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
 
         // Check for discord.js
         try {
@@ -49,6 +50,8 @@ class ShardingClient {
         if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
         if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
+        if (postNetworkStatistics == null || postNetworkStatistics == undefined) postMemStatistics = true;
+        if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
 
         // Local config
         this.autoposting = autopost;
@@ -64,10 +67,12 @@ class ShardingClient {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
+        this.used_bytes = 0;
 
         // Opt ins
         this.postCpuStatistics = postCpuStatistics;
         this.postMemStatistics = postMemStatistics;
+        this.postNetworkStatistics = postNetworkStatistics;
         
         /**
          * Create custom fields map
@@ -88,7 +93,9 @@ class ShardingClient {
                     setTimeout(async () => {
                         console.log("Starting autopost");
 
-                        await this.post();
+                        let initialPostError = await this.post();
+
+                        if (initialPostError) console.error(initialPostError);
 
                         setInterval(async () => {
                             await this.post();
@@ -122,6 +129,18 @@ class ShardingClient {
      * @returns {Promise<boolean | Error>} returns false if there was no error, returns an error if there was.
      */
     async post() {
+        let bandwidth = 0;
+
+        if (this.postNetworkStatistics) {
+            // Set initial used network bytes count
+            if (this.used_bytes <= 0) this.used_bytes = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
+
+            // Calculate used bandwidth
+            let used_bytes_latest = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
+            bandwidth = used_bytes_latest - this.used_bytes;
+            this.used_bytes = used_bytes_latest;
+        }
+
         // counts
         let guild_count = 0;
         let user_count = 0;
@@ -154,7 +173,6 @@ class ShardingClient {
         let memactive = 0;
         let memload = 0;
         let cpuload = 0;
-        let cputemp = 0;
 
         // Get mem stats
         if (this.postMemStatistics) {
@@ -177,12 +195,6 @@ class ShardingClient {
                 // Get current load
                 cpuload = Math.round(load.currentload);
             }
-
-            // Get cpu temperature
-            const temp = await si.cpuTemperature();
-
-            // The temperature is reported as "-1" if it cant get the actual temp. We need to report 0 if this is the case
-            cputemp = temp.main !== -1 ? temp.main : 0;
         }
 
         // Get client id
@@ -200,7 +212,7 @@ class ShardingClient {
             memactive: memactive.toString(), // Actively used memory
             memload: memload.toString(), // Active memory load in %
             cpuload: cpuload.toString(), // CPU load in %
-            cputemp: cputemp.toString(), // CPU temp in deg celcius
+            bandwidth: bandwidth.toString(), // Used bandwidth in bytes
             custom1: "0", // Custom field 1
             custom2: "0" // Custom field 2
         }
