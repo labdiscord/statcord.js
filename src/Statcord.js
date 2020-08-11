@@ -46,7 +46,7 @@ class Statcord {
         if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
         if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
-        if (postNetworkStatistics == null || postNetworkStatistics == undefined) postMemStatistics = true;
+        if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
         if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
 
         // Local config
