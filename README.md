@@ -21,8 +21,6 @@
     -   [Normal Usage][20]
     -   [Sharding Usage][21]
 
-### In order to report temperatures correctly please ensure you do the following:
-
 ## Statcord
 
 ### post
