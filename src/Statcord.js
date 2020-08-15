@@ -12,6 +12,7 @@ class Statcord {
      * @property {*} client - your discord.js client
      * @property {boolean} [postCpuStatistics=true] - Whether you want to post CPU usage
      * @property {boolean} [postMemStatistics=true] - Whether you want to post mem usage
+     * @property {boolean} [postNetworkStatistics=true] - Whether you want to post mem usage
      */
 
      /**
@@ -24,7 +25,7 @@ class Statcord {
      */
     constructor(options) {
         const { key, client } = options;
-        let { postCpuStatistics, postMemStatistics } = options;
+        let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
 
         // Check for discord.js
         try {
@@ -45,6 +46,8 @@ class Statcord {
         if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
         if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
+        if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
+        if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
 
         // Local config
         this.autoposting = false;
@@ -60,10 +63,12 @@ class Statcord {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
+        this.used_bytes = 0;
 
         // Opt ins
         this.postCpuStatistics = postCpuStatistics;
         this.postMemStatistics = postMemStatistics;
+        this.postNetworkStatistics = postNetworkStatistics;
 
         /**
          * Create custom fields map
@@ -87,6 +92,18 @@ class Statcord {
     async post() {
         // Non-Sharding client
         if (this.sharding) return new Error("Please use the statcord sharding client if you wish to use shards");
+
+        let bandwidth = 0;
+
+        if (this.postNetworkStatistics) {
+            // Set initial used network bytes count
+            if (this.used_bytes <= 0) this.used_bytes = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
+
+            // Calculate used bandwidth
+            let used_bytes_latest = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
+            bandwidth = used_bytes_latest - this.used_bytes;
+            this.used_bytes = used_bytes_latest;
+        }
 
         // counts
         let guild_count = 0;
@@ -120,7 +137,6 @@ class Statcord {
         let memactive = 0;
         let memload = 0;
         let cpuload = 0;
-        let cputemp = 0;
 
         // Get mem stats
         if (this.postMemStatistics) {
@@ -143,12 +159,6 @@ class Statcord {
                 // Get current load
                 cpuload = Math.round(load.currentload);
             }
-
-            // Get cpu temperature
-            const temp = await si.cpuTemperature();
-
-            // The temperature is reported as "-1" if it cant get the actual temp. We need to report 0 if this is the case
-            cputemp = temp.main !== -1 ? temp.main : 0;
         }
 
         // Post data
@@ -163,7 +173,7 @@ class Statcord {
             memactive: memactive.toString(), // Actively used memory
             memload: memload.toString(), // Active memory load in %
             cpuload: cpuload.toString(), // CPU load in %
-            cputemp: cputemp.toString(), // CPU temp in deg celcius
+            bandwidth: bandwidth.toString(), // Used bandwidth in bytes
             custom1: "0", // Custom field 1
             custom2: "0" // Custom field 2
         }
