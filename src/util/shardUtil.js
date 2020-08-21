@@ -1,10 +1,4 @@
-/**
- * Post stats about a command
- * @memberof ShardingClient
- * @param {string} command_name - The name of the command that was run
- * @param {string} author_id - The id of the user that ran the command
- * @param {*} client - The discord client this command is being posted for
- */
+// Post stats about a command
 module.exports.postCommand = (command_name, author_id, client) => {
     // Get discord for type checking
     const Discord = require("discord.js");
@@ -23,11 +17,8 @@ module.exports.postCommand = (command_name, author_id, client) => {
     // Send message with args to Statcord Sharding Client
     client.shard.send(`sscpc|=-ssc-=|${command_name}|=-ssc-=|${author_id}`);
 }
-/**
- * Post all current stats to statcord
- * @memberof ShardingClient
- * @param {*} client - The discord client this command is being posted for
- */
+
+// Post all current stats to statcord
 module.exports.post = (client) => {
     // Get discord for type checking
     const Discord = require("discord.js");

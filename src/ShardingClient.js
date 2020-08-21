@@ -1,29 +1,12 @@
 // Modules
 const fetch = require("node-fetch");
 const si = require("systeminformation");
+const ShardingUtil = require("./util/shardUtil");
 
-/**
- * @class ShardingClient
- */
 class ShardingClient {
-    /**
-     * @typedef {Object} ShardingClientOptions
-     * @property {string} key - your statcord key prefix by "statcord.com-""
-     * @property {*} manager - your discord.js shardingmanager
-     * @property {boolean} autopost - whether to autopost or not
-     * @property {boolean} [postCpuStatistics=true] - Whether you want to post CPU usage
-     * @property {boolean} [postMemStatistics=true] - Whether you want to post mem usage
-     * @property {boolean} [postNetworkStatistics=true] - Whether you want to post mem usage
-     */
+    static post = ShardingUtil.post;
+    static postCommand = ShardingUtil.postCommand;
 
-    /**
-     * @typedef {import("discord.js").ShardingManager} ShardingManager
-     */
-
-    /**
-     * Sharding client
-     * @param {ShardingClientOptions} options
-     */
     constructor(options) {
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
@@ -74,11 +57,7 @@ class ShardingClient {
         this.postMemStatistics = postMemStatistics;
         this.postNetworkStatistics = postNetworkStatistics;
         
-        /**
-         * Create custom fields map
-         * @type {Map<1 | 2, (manager: ShardingManager) => Promise<string>> }
-         * @private
-         */
+        // Create custom fields map
         this.customFields = new Map();
 
         // Check if all shards have been spawned
@@ -123,11 +102,7 @@ class ShardingClient {
         });
     }
 
-    /**
-     * Manual posting
-     * @private
-     * @returns {Promise<boolean | Error>} returns false if there was no error, returns an error if there was.
-     */
+    // Post stats to API
     async post() {
         let bandwidth = 0;
 
@@ -281,12 +256,7 @@ class ShardingClient {
         }
     }
 
-    /**
-     * Post stats about a command
-     * @private
-     * @param {string} command_name - The name of the command that was run
-     * @param {string} author_id - The id of the user that ran the command
-     */
+    // Post stats about a command
     async postCommand(command_name, author_id) {
         // Command name error checking
         if (!command_name) throw new Error('"command_name" is missing or undefined');
@@ -316,13 +286,8 @@ class ShardingClient {
         this.commandsRun++;
     }
 
-    /**
-     * Register the function to get the values for posting
-     * @param {1 | 2} customFieldNumber - Whether the handler is for customField1 or customField2 
-     * @param {(manager: ShardingManager) => Promise<string>} handler - Your function to get
-     * @returns {Error | null}
-     */
-    async registerCustomFieldHandler(customFieldNumber, handler) {
+    // Register the function to get the values for posting
+    registerCustomFieldHandler(customFieldNumber, handler) {
         // Check if the handler already exists
         if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
 
@@ -353,9 +318,3 @@ async function getUserCountV11(manager) {
 //end
 
 module.exports = ShardingClient;
-
-const ShardingUtil = require("./util/shardUtil");
-const { cpu } = require("systeminformation");
-
-module.exports.postCommand = ShardingUtil.postCommand;
-module.exports.post = ShardingUtil.post;
