@@ -1,6 +1,6 @@
 {
   "name": "statcord.js-beta",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Upload Statcord info to the official API!",
   "main": "src/index.js",
   "keywords": [
@@ -16,11 +16,12 @@
     "systeminformation": "^4.26.9"
   },
   "devDependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^12.3.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/labdiscord/statcord.js"
   },
-  "homepage": "https://github.com/labdiscord/statcord.js"
+  "homepage": "https://github.com/labdiscord/statcord.js",
+  "types": "./src/typings/index.d.ts"
 }
