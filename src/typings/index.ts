@@ -1,5 +1,5 @@
 /// <reference path="./index.d.ts" />
-
+// TESTS
 import { Client, ShardingClient } from "statcord.js-beta";
 import * as Discord from "discord.js";
 
@@ -19,3 +19,9 @@ const sClient = new ShardingClient({
     postMemStatistics: true,
     postNetworkStatistics: true
 });
+
+client.on("post", (status) => {});
+client.on("autopost-start", () => {});
+
+sClient.on("post", (status) => {});
+sClient.on("autopost-start", () => {});
