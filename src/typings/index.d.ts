@@ -1,6 +1,7 @@
 declare module "statcord.js-beta" {
     // Import modules
     import * as Discord from "discord.js";
+    import { EventEmitter } from "events";
 
     // Create options
     interface BaseClientOptions {
@@ -21,7 +22,7 @@ declare module "statcord.js-beta" {
     }
 
     // Create client typings
-    class BaseClient {
+    class BaseClient extends EventEmitter {
         private autoposting: boolean;
 
         private baseApiUrl: string;
@@ -44,11 +45,15 @@ declare module "statcord.js-beta" {
         private postMemStatistics: boolean;
         private postNetworkStatistics: boolean;
 
-        private customFields: Map<1 | 2, (manager: Discord.ShardingManager) => Promise<string>>;
+        public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+        public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
+        public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
     }
 
     export class ShardingClient extends BaseClient {
         constructor(options: ShardingClientOptions);
+
+        private customFields: Map<1 | 2, (manager: Discord.ShardingManager) => Promise<string>>;
 
         public static post(client: Discord.Client): void;
         public static postCommand(command_name: string, author_id: string, client: Discord.Client): void; 
@@ -61,9 +66,17 @@ declare module "statcord.js-beta" {
     export class Client extends BaseClient {
         constructor(options: ClientOptions);
 
+        private customFields: Map<1 | 2, (manager: Discord.Client) => Promise<string>>;
+
         public autopost(): Promise<boolean | Error>;
         public post(): Promise<boolean | Error>;
         public postCommand(command_name: string, author: string): Promise<void>;
         public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (client: Discord.Client) => Promise<string>): Error | null;
+    }
+
+    interface ClientEvents {
+        "post": [boolean],
+        "autopost-start": [],
+        "error": [Error]
     }
 }
