@@ -58,7 +58,7 @@ declare module "statcord.js-beta" {
         public static post(client: Discord.Client): void;
         public static postCommand(command_name: string, author_id: string, client: Discord.Client): void; 
 
-        private post(): Promise<boolean | Error>;
+        private post(): Promise<void>;
         private postCommand(command_name: string, author: string): Promise<void>;
         public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (manager: Discord.ShardingManager) => Promise<string>): Error | null;
     }
@@ -75,8 +75,7 @@ declare module "statcord.js-beta" {
     }
 
     interface ClientEvents {
-        "post": [boolean],
-        "autopost-start": [],
-        "error": [Error]
+        "post": [boolean | Error | string],
+        "autopost-start": []
     }
 }
