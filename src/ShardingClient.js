@@ -41,7 +41,7 @@ class ShardingClient extends EventEmitter {
         this.autoposting = autopost;
 
         // API config
-        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; //TODO update before full release
+        this.baseApiUrl = "https://statcord.com/logan/stats";
         this.key = key;
         this.manager = manager;
 
