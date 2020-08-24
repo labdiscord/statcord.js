@@ -32,6 +32,9 @@ class Statcord {
         // Local config
         this.autoposting = false;
 
+        // Local config
+        this.autoposting = false;
+
         // API config
         this.baseApiUrl = "https://beta.statcord.com/logan/stats"; // TODO update for full release
         this.key = key;
