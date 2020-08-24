@@ -73,9 +73,7 @@ class ShardingClient extends EventEmitter {
                     setTimeout(async () => {
                         this.emit("autopost-start");
 
-                        let initialPostError = await this.post();
-
-                        if (initialPostError) this.emit("error", initialPostError);
+                        this.post();
 
                         setInterval(async () => {
                             await this.post();

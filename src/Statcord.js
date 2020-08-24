@@ -1,8 +1,9 @@
 // Modules
 const fetch = require("node-fetch");
 const si = require("systeminformation");
+const { EventEmitter } = require("events");
 
-class Statcord {
+class Statcord extends EventEmitter {
     constructor(options) {
         const { key, client } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
@@ -180,7 +181,7 @@ class Statcord {
                 }
             });
         } catch (e) {
-            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+            this.emit("post", "Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
 
             if (!this.autoposting) {
                 setTimeout(() => {
@@ -192,29 +193,30 @@ class Statcord {
         } 
 
         // Server error on statcord
-        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) {
+            this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
+            return;
+        }
 
         // Get body as JSON
         let responseData;
         try {
             responseData = await response.json();
         } catch {
-            return new Error(`Statcord server error, invalid json response`);
+            this.emit("post", new Error(`Statcord server error, invalid json response`));
+            return;
         }
 
         // Check response for errors
         if (response.status == 200) {
             // Success
-            if (!responseData.error) return Promise.resolve(false);
-        } else if (response.status == 400) {
-            // Bad request
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
-        } else if (response.status == 429) {
-            // Rate limit hit
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
+            if (!responseData.error) this.emit("post", false);
+        } else if (response.status == 400 || response.status == 429) {
+            // Bad request or Rate limit hit
+            if (responseData.error) this.emit("post", new Error(responseData.message));
         } else {
             // Other
-            return Promise.resolve(new Error("An unknown error has occurred"));
+            this.emit("post", new Error("An unknown error has occurred"));
         }
     }
 
@@ -236,6 +238,8 @@ class Statcord {
 
         // set autoposting var
         this.autoposting = true;
+
+        this.emit("autopost-start");
 
         // resolve with initial errors
         return Promise.resolve(post);
