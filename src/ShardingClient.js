@@ -9,6 +9,8 @@ class ShardingClient extends EventEmitter {
     static postCommand = ShardingUtil.postCommand;
 
     constructor(options) {
+        super();
+
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
 
