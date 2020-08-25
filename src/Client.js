@@ -1,9 +1,8 @@
 // Modules
 const fetch = require("node-fetch");
 const si = require("systeminformation");
-const { EventEmitter } = require("events");
 
-class Statcord extends EventEmitter {
+export class Statcord {
     constructor(options) {
         const { key, client } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
@@ -33,11 +32,8 @@ class Statcord extends EventEmitter {
         // Local config
         this.autoposting = false;
 
-        // Local config
-        this.autoposting = false;
-
         // API config
-        this.baseApiUrl = "https://statcord.com/logan/stats";
+        this.baseApiUrl = "https://statcord.com/logan/stats"; 
         this.key = key;
         this.client = client;
 
@@ -184,7 +180,7 @@ class Statcord extends EventEmitter {
                 }
             });
         } catch (e) {
-            this.emit("post", "Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
 
             if (!this.autoposting) {
                 setTimeout(() => {
@@ -196,30 +192,29 @@ class Statcord extends EventEmitter {
         } 
 
         // Server error on statcord
-        if (response.status >= 500) {
-            this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
-            return;
-        }
+        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
 
         // Get body as JSON
         let responseData;
         try {
             responseData = await response.json();
         } catch {
-            this.emit("post", new Error(`Statcord server error, invalid json response`));
-            return;
+            return new Error(`Statcord server error, invalid json response`);
         }
 
         // Check response for errors
         if (response.status == 200) {
             // Success
-            if (!responseData.error) this.emit("post", false);
-        } else if (response.status == 400 || response.status == 429) {
-            // Bad request or Rate limit hit
-            if (responseData.error) this.emit("post", new Error(responseData.message));
+            if (!responseData.error) return Promise.resolve(false);
+        } else if (response.status == 400) {
+            // Bad request
+            if (responseData.error) return Promise.resolve(new Error(responseData.message));
+        } else if (response.status == 429) {
+            // Rate limit hit
+            if (responseData.error) return Promise.resolve(new Error(responseData.message));
         } else {
             // Other
-            this.emit("post", new Error("An unknown error has occurred"));
+            return Promise.resolve(new Error("An unknown error has occurred"));
         }
     }
 
@@ -241,8 +236,6 @@ class Statcord extends EventEmitter {
 
         // set autoposting var
         this.autoposting = true;
-
-        this.emit("autopost-start");
 
         // resolve with initial errors
         return Promise.resolve(post);
@@ -290,5 +283,3 @@ class Statcord extends EventEmitter {
         this.customFields.set(customFieldNumber, handler);
     }
 }
-
-module.exports = Statcord;
