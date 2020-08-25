@@ -215,7 +215,7 @@ class Statcord extends EventEmitter {
         // Check response for errors
         if (response.status == 200) {
             // Success
-            if (!responseData.error) this.emit("post", false);
+            this.emit("post", false);
         } else if (response.status == 400 || response.status == 429) {
             // Bad request or Rate limit hit
             if (responseData.error) this.emit("post", new Error(responseData.message));
