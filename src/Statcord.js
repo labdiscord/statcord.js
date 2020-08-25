@@ -7,7 +7,7 @@ class Statcord extends EventEmitter {
     constructor(options) {
         const { key, client } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
-
+        super(options)
         // Check for discord.js
         try {
             this.discord = require("discord.js");
