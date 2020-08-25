@@ -33,7 +33,7 @@ export class Statcord {
         this.autoposting = false;
 
         // API config
-        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; // TODO update for full release
+        this.baseApiUrl = "https://statcord.com/logan/stats"; 
         this.key = key;
         this.client = client;
 
