@@ -116,6 +116,8 @@ class ShardingClient extends EventEmitter {
 
     // Post stats to API
     async post() {
+        this.debugLog("Starting post", "post");
+
         let bandwidth = 0;
 
         if (this.postNetworkStatistics) {
