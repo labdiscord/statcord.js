@@ -3,6 +3,8 @@ const fetch = require("node-fetch");
 const si = require("systeminformation");
 const ShardingUtil = require("./util/shardUtil");
 const { EventEmitter } = require("events");
+const util = require("util");
+const fs = require("fs");
 
 class ShardingClient extends EventEmitter {
     static post = ShardingUtil.post;
@@ -11,13 +13,16 @@ class ShardingClient extends EventEmitter {
     constructor(options) {
         super();
 
+        this.debug = options.debug?.enabled || false;
+        this.debug_outfile = options.debug?.outfile || null;
+
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
 
         // Check for discord.js
         try {
             this.discord = require("discord.js");
-        } catch(e) {
+        } catch (e) {
             throw new Error("statcord.js needs discord.js to function");
         }
 
@@ -59,7 +64,7 @@ class ShardingClient extends EventEmitter {
         this.postCpuStatistics = postCpuStatistics;
         this.postMemStatistics = postMemStatistics;
         this.postNetworkStatistics = postNetworkStatistics;
-        
+
         // Create custom fields map
         this.customFields = new Map();
 
@@ -71,14 +76,19 @@ class ShardingClient extends EventEmitter {
             // If this is the last shard, wait until it is ready
             if (shard.id + 1 == this.manager.totalShards && autopost) {
                 // When ready start auto post
+                if (this.debug) this.debugLog("Listening for final shard \"ready\" event");
                 currShard.once("ready", () => {
                     setTimeout(async () => {
+                        if (this.debug) this.debugLog("Starting autopost");
                         this.emit("autopost-start");
 
+                        if (this.debug) this.debugLog("Initial post");
                         this.post();
 
-                        setInterval(async () => {
-                            await this.post();
+                        if (this.debug) this.debugLog("Starting interval");
+
+                        setInterval(() => {
+                            this.post();
                         }, 60000);
                     }, 200);
                 });
@@ -94,11 +104,12 @@ class ShardingClient extends EventEmitter {
                 let args = message.split("|=-ssc-=|"); // get the args
 
                 if (args[0] == "sscpc") { // PostCommand message
-                    await this.postCommand(args[1], args[2]);
+                    if (this.debug) this.debugLog("Received command post from shard");
+                    this.postCommand(args[1], args[2]);
                 } else if (args[0] == "sscp") { // Post message
-                        let post = await this.post();
-                        if (post) this.emit("error", post);
-                    }
+                    if (this.debug) this.debugLog("Received full post request from shard");
+                    this.post();
+                }
             });
         });
     }
@@ -201,7 +212,14 @@ class ShardingClient extends EventEmitter {
         // Get custom field two value
         if (this.customFields.get(2)) {
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
-        }     
+        }
+
+        if (this.debug) {
+            this.debugLog(
+              `Post Data\n${util.inspect(requestBody, false, null, false)}`,
+              "post"
+            );
+        }
 
         // Reset stats
         this.activeUsers = [];
@@ -230,8 +248,16 @@ class ShardingClient extends EventEmitter {
             return;
         }
 
+        if (this.debug) {
+            this.debugLog(
+              `Fetch response\n${util.inspect(response, false, null, false)}`,
+              "post"
+            );
+        }
+
         // Statcord server side errors
         if (response.status >= 500) {
+            if (this.debug) this.debugLog("HTTP 500 error received", "post");
             this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
             return;
         }
@@ -241,21 +267,36 @@ class ShardingClient extends EventEmitter {
         try {
             responseData = await response.json();
         } catch {
+            if (this.debug) this.debugLog("Invalid response data received", "post");
             this.emit("post", new Error(`Statcord server error, invalid json response`));
             return;
         }
 
+        if (this.debug) {
+            this.debugLog(
+              `Response data\n${util.inspect(responseData, false, null, false)}`,
+              "post"
+            );
+        }
+
         // Check response for errors
         if (response.status == 200) {
+            if (this.debug) this.debugLog("HTTP code 200", "post");
             // Success
             this.emit("post", false);
         } else if (response.status == 400 || response.status == 429) {
+            if (this.debug) this.debugLog(`HTTP code ${response.status}`, "post");
+            if (this.debug) this.debugLog(responseData.error, "post");
+            if (this.debug) this.debugLog(responseData.message, "post");
             // Bad request or rate limit hit
-            if (responseData.error) this.emit("post", new Error(responseData.message));
+            this.emit("post", new Error(responseData.message));
         } else {
+            if (this.debug) this.debugLog(`UNKNOWN HTTP ERROR: ${response.status}`, "post");
             // Other
             this.emit("post", new Error("An unknown error has occurred"));
         }
+
+        this.debugLog("Post end", "post");
     }
 
     // Post stats about a command
@@ -295,6 +336,19 @@ class ShardingClient extends EventEmitter {
 
         // If it doen't set it
         this.customFields.set(customFieldNumber, handler);
+    }
+
+    
+    debugLog(info, type = "") {
+        let out = `[Statcord${type.length > 1 ? ` - ${type}` : ""}] ${info}`;
+
+        if (this.debug_outfile) {
+            fs.appendFile(require("path").join(process.cwd(), this.debug_outfile), out + "\n", (err) => {
+                if (err) console.error(err);
+            });
+        } else {
+            console.info(out);
+        }
     }
 }
 

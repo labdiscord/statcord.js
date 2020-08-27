@@ -9,6 +9,10 @@ declare module "statcord.js" {
         postCpuStatistics?: boolean;
         postMemStatistics?: boolean;
         postNetworkStatistics?: boolean;
+        debug?: {
+            enabled: boolean;
+            outfile?: string;
+        }
     }
 
     // Sharding client options
@@ -48,6 +52,8 @@ declare module "statcord.js" {
         public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
         public once<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): this;
         public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): boolean;
+
+        private debug(info: string, type: string): void;
     }
 
     export class ShardingClient extends BaseClient {
