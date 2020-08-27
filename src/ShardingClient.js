@@ -71,12 +71,13 @@ class ShardingClient {
                 currShard.once("ready", () => {
                     setTimeout(async () => {
                         console.log("Starting autopost");
-
+    
                         let initialPostError = await this.post();
-
+                        console.log("Initial Post Done")
                         if (initialPostError) console.error(initialPostError);
 
                         setInterval(async () => {
+                            console.log("Attempting Posting")
                             await this.post();
                         }, 60000);
                     }, 200);
@@ -104,8 +105,9 @@ class ShardingClient {
 
     // Post stats to API
     async post() {
+        console.log("Starting The Post Sequence")
         let bandwidth = 0;
-
+        console.log(this.postNetworkStatistics)
         if (this.postNetworkStatistics) {
             // Set initial used network bytes count
             if (this.used_bytes <= 0) this.used_bytes = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
@@ -122,13 +124,15 @@ class ShardingClient {
 
         // V12 code
         if (this.v12) {
+            console.log("V12")
             guild_count = await getGuildCountV12(this.manager);
             user_count = await getUserCountV12(this.manager);
         } else if (this.v11) { // V11 code
+            console.log("V11")
             guild_count = await getGuildCountV11(this.manager);
             user_count = await getUserCountV11(this.manager);
         }
-
+        console.log("Popular Sorting")
         // Get and sort popular commands
         let popular = [];
 
@@ -143,7 +147,7 @@ class ShardingClient {
 
         // Limit popular to the 5 most popular
         if (popular.length > 5) popular.length = 5;
-
+        print("System Information")
         // Get system information
         let memactive = 0;
         let memload = 0;
@@ -171,10 +175,10 @@ class ShardingClient {
                 cpuload = Math.round(load.currentload);
             }
         }
-
+        print("ok lets try this")
         // Get client id
         let id = (await this.manager.broadcastEval("this.user.id"))[0];
-
+        print("Gen Data")
         // Post data
         let requestBody = {
             id, // Client id
@@ -206,7 +210,7 @@ class ShardingClient {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
-
+        print("Sending Request")
         // Create post request
         let response;
         try {
@@ -228,7 +232,8 @@ class ShardingClient {
 
             return;
         }
-
+        print("ya its done boys")
+        print(response.status)
         // Statcord server side errors
         if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
 
