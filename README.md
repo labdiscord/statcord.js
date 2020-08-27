@@ -2,7 +2,6 @@
 
 ### Table of Contents
 
--   [Issues][27]
 -   [Statcord][1]
     -   [post][2]
     -   [autopost][3]
@@ -27,13 +26,13 @@
 
 Manual posting
 
-Returns **[Promise][15]&lt;([boolean][16] \| [Error][17])>** returns false if there was no error, returns an error if there was.
+Emits the **[post][28]** event
 
 ### autopost
 
 Auto posting
 
-Returns **[Promise][15]&lt;([boolean][16] \| [Error][17])>** returns false if there was no error, returns an error if there was. Only on the first run, otherwise the rest will be ignored
+Emits the **[autopost-start][29]** event
 
 ### postCommand
 
@@ -82,9 +81,7 @@ Post stats about a command
 
 Post all current stats to statcord
 
-#### Parameters
-
--   `client` **any** The discord client this command is being posted for
+Emits the **[post][28]** event
 
 ## Handlers
 
@@ -107,6 +104,20 @@ Asynchronous function
 - `manager` **[Discord.js ShardingManager][26]** The manager is passed to your function when getting the data
 
 Returns **(Promise<[string][18]>)**
+
+# Events
+
+## post event
+
+"post" - Emitted whenever a post to the api takes place
+
+### Parameters
+
+status - **(false | [Error][17] | [string][18])**
+
+## autopost-start event
+
+"autopost-start" - Emitted when autopost is started
 
 # Examples
 
@@ -147,10 +158,7 @@ client.on("ready", async () => {
     console.log("ready");
 
     // Start auto posting
-    let initalPostError = await statcord.autopost();
-
-    // If there is an error, console.error and exit
-    if (initalPostError) console.error(initalPost);
+    statcord.autopost();
 });
 
 
@@ -174,14 +182,21 @@ client.on("message", async (message) => {
         if (message.author.id !== "bot_owner_id") return;
 
         // Example of manual posting
-        let postError = await statcord.post();
-
-        // If there is a post error notify command runner
-        if (postError) {
-            message.channel.send(postError.message);
-        }
+        statcord.post();
     }
-})
+});
+
+statcord.on("autopost-start", () => {
+    // Emitted when statcord autopost starts
+    console.log("Started autopost");
+});
+
+statcord.on("post", status => {
+    // status = false if the post was successful
+    // status = "Error message" or status = Error if there was an error
+    if (!status) console.log("Successful post");
+    else console.error(status);
+});
 
 client.login("TOKEN");
 ```
@@ -224,6 +239,18 @@ client.login("TOKEN");
     // Normal shardCreate event
     manager.on("shardCreate", (shard) => {
         console.log(`Spawned shard ${shard.id}`);
+    });
+
+    statcord.on("autopost-start", () => {
+        // Emitted when statcord autopost starts
+        console.log("Started autopost");
+    });
+
+    statcord.on("post", status => {
+        // status = false if the post was successful
+        // status = "Error message" or status = Error if there was an error
+        if (!status) console.log("successful post");
+        else console.error(status);
     });
 ```
 
@@ -326,3 +353,9 @@ client.login("TOKEN");
 [26]: https://discord.js.org/#/docs/main/stable/class/ShardingManager
 
 [27]: #issues
+
+[28]: #post-event
+
+[29]: #autopost-start-event
+
+[30]: #events
