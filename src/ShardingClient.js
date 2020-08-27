@@ -104,10 +104,10 @@ class ShardingClient extends EventEmitter {
                 let args = message.split("|=-ssc-=|"); // get the args
 
                 if (args[0] == "sscpc") { // PostCommand message
-                    if (this.debug) this.debugLog("Recieved command post from shard");
+                    if (this.debug) this.debugLog("Received command post from shard");
                     this.postCommand(args[1], args[2]);
                 } else if (args[0] == "sscp") { // Post message
-                    if (this.debug) this.debugLog("Recieved full post request from shard");
+                    if (this.debug) this.debugLog("Received full post request from shard");
                     this.post();
                 }
             });
@@ -257,7 +257,7 @@ class ShardingClient extends EventEmitter {
 
         // Statcord server side errors
         if (response.status >= 500) {
-            if (this.debug) this.debugLog("HTTP 500 error recieved", "post");
+            if (this.debug) this.debugLog("HTTP 500 error received", "post");
             this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
             return;
         }
@@ -291,7 +291,7 @@ class ShardingClient extends EventEmitter {
             // Bad request or rate limit hit
             this.emit("post", new Error(responseData.message));
         } else {
-            if (this.debug) this.debugLog(`UNKOWN HTTP ERROR: ${response.status}`, "post");
+            if (this.debug) this.debugLog(`UNKNOWN HTTP ERROR: ${response.status}`, "post");
             // Other
             this.emit("post", new Error("An unknown error has occurred"));
         }
