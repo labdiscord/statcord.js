@@ -13,8 +13,13 @@ class ShardingClient extends EventEmitter {
     constructor(options) {
         super();
 
-        this.debug = options.debug?.enabled || false;
-        this.debug_outfile = options.debug?.outfile || null;
+        if (!options.debug) options.debug = {
+            enabled: false,
+            outfile: null
+        }
+
+        this.debug = options.debug.enabled || false;
+        this.debug_outfile = options.debug.outfile || null;
 
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
