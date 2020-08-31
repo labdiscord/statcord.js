@@ -284,9 +284,13 @@ class Statcord extends EventEmitter {
     }
 
     // Register the function to get the values for posting
-    registerCustomFieldHandler(customFieldNumber, handler) {
+    async registerCustomFieldHandler(customFieldNumber, handler) {
         // Check if the handler already exists
-        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+        if (this.customFields.get(customFieldNumber)) throw new Error("Handler already exists");
+
+        // Testing
+        if (typeof handler !== "function") throw new Error("Handler is not a function");
+        if (typeof (await handler(this.client)) !== "string") throw new Error("Handler doesn't return strings");
 
         // If it doen't set it
         this.customFields.set(customFieldNumber, handler);
