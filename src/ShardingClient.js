@@ -213,12 +213,18 @@ class ShardingClient extends EventEmitter {
 
         // Get custom field one value
         if (this.customFields.get(1)) {
+            this.debugLog("Start getting custom field 1", "post");
             requestBody.custom1 = await this.customFields.get(1)(this.manager);
+            this.debugLog(requestBody.custom1, "post");
+            this.debugLog("End getting custom field 1", "post");
         }
 
         // Get custom field two value
         if (this.customFields.get(2)) {
+            this.debugLog("Start getting custom field 2", "post");
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
+            this.debugLog(requestBody.custom2, "post");
+            this.debugLog("End getting custom field 2", "post");
         }
 
         if (this.debug) {
