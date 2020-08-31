@@ -66,7 +66,7 @@ declare module "statcord.js" {
 
         private post(): Promise<void>;
         private postCommand(command_name: string, author: string): Promise<void>;
-        public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (manager: Discord.ShardingManager) => Promise<string>): Error | null;
+        public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (manager: Discord.ShardingManager) => Promise<string>): Promise<null>;
     }
 
     export class Client extends BaseClient {
@@ -77,7 +77,7 @@ declare module "statcord.js" {
         public autopost(): Promise<boolean | Error>;
         public post(): Promise<boolean | Error>;
         public postCommand(command_name: string, author: string): Promise<void>;
-        public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (client: Discord.Client) => Promise<string>): Error | null;
+        public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (client: Discord.Client) => Promise<string>): Promise<null>;
     }
 
     interface ClientEvents {

@@ -213,18 +213,18 @@ class ShardingClient extends EventEmitter {
 
         // Get custom field one value
         if (this.customFields.get(1)) {
-            this.debugLog("Start getting custom field 1", "post");
+            if (this.debug) this.debugLog("Start getting custom field 1", "post");
             requestBody.custom1 = await this.customFields.get(1)(this.manager);
-            this.debugLog(requestBody.custom1, "post");
-            this.debugLog("End getting custom field 1", "post");
+            if (this.debug) this.debugLog(requestBody.custom1, "post");
+            if (this.debug) this.debugLog("End getting custom field 1", "post");
         }
 
         // Get custom field two value
         if (this.customFields.get(2)) {
-            this.debugLog("Start getting custom field 2", "post");
+            if (this.debug) this.debugLog("Start getting custom field 2", "post");
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
-            this.debugLog(requestBody.custom2, "post");
-            this.debugLog("End getting custom field 2", "post");
+            if (this.debug) this.debugLog(requestBody.custom2, "post");
+            if (this.debug) this.debugLog("End getting custom field 2", "post");
         }
 
         if (this.debug) {
@@ -343,9 +343,13 @@ class ShardingClient extends EventEmitter {
     }
 
     // Register the function to get the values for posting
-    registerCustomFieldHandler(customFieldNumber, handler) {
+    async registerCustomFieldHandler(customFieldNumber, handler) {
         // Check if the handler already exists
-        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+        if (this.customFields.get(customFieldNumber)) throw new Error("Handler already exists");
+
+        // Testing
+        if (typeof handler !== "function") throw new Error("Handler is not a function");
+        if (typeof (await handler(this.manager)) !== "string") throw new Error("Handler doesn't return strings");
 
         // If it doen't set it
         this.customFields.set(customFieldNumber, handler);
