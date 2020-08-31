@@ -13,8 +13,13 @@ class ShardingClient extends EventEmitter {
     constructor(options) {
         super();
 
-        this.debug = options.debug?.enabled || false;
-        this.debug_outfile = options.debug?.outfile || null;
+        if (!options.debug) options.debug = {
+            enabled: false,
+            outfile: null
+        }
+
+        this.debug = options.debug.enabled || false;
+        this.debug_outfile = options.debug.outfile || null;
 
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
@@ -116,6 +121,8 @@ class ShardingClient extends EventEmitter {
 
     // Post stats to API
     async post() {
+        this.debugLog("Starting post", "post");
+
         let bandwidth = 0;
 
         if (this.postNetworkStatistics) {
@@ -206,12 +213,18 @@ class ShardingClient extends EventEmitter {
 
         // Get custom field one value
         if (this.customFields.get(1)) {
+            this.debugLog("Start getting custom field 1", "post");
             requestBody.custom1 = await this.customFields.get(1)(this.manager);
+            this.debugLog(requestBody.custom1, "post");
+            this.debugLog("End getting custom field 1", "post");
         }
 
         // Get custom field two value
         if (this.customFields.get(2)) {
+            this.debugLog("Start getting custom field 2", "post");
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
+            this.debugLog(requestBody.custom2, "post");
+            this.debugLog("End getting custom field 2", "post");
         }
 
         if (this.debug) {
