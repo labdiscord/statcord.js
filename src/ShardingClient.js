@@ -349,6 +349,8 @@ class ShardingClient extends EventEmitter {
 
         // Testing
         if (typeof handler !== "function") throw new Error("Handler is not a function");
+        let handlerResponse = await PromiseTimout(20000, handler);
+        if (typeof handlerResponse == "object" && handlerResponse.timeout) throw new Error("Handler timout (timeout is 20s)");
         if (typeof (await handler(this.manager)) !== "string") throw new Error("Handler doesn't return strings");
 
         // If it doen't set it
@@ -357,7 +359,7 @@ class ShardingClient extends EventEmitter {
 
     
     debugLog(info, type = "") {
-        let out = `[Statcord${type.length > 1 ? ` - ${type}` : ""}] ${info}`;
+        let out = `[Statcord${type.length > 0 ? ` - ${type}` : ""}] ${info}`;
 
         if (this.debug_outfile) {
             fs.appendFile(require("path").join(process.cwd(), this.debug_outfile), out + "\n", (err) => {
@@ -389,5 +391,25 @@ async function getUserCountV11(manager) {
     return (await manager.fetchClientValues("users.size")).reduce((prev, current) => prev + current, 0);
 }
 //end
+
+/**
+ * @param {number} timeoutMs 
+ * @param {Promise<any>} promise
+ * @returns {Promise<any>}
+ */
+function PromiseTimout (timeoutMs, promise) { 
+  let timeoutHandle;
+  const timeoutPromise = new Promise((resolve, reject) => {
+    timeoutHandle = setTimeout(() => resolve({timeout: true}), timeoutMs);
+  });
+
+  return Promise.race([ 
+    promise(), 
+    timeoutPromise, 
+  ]).then((result) => {
+    clearTimeout(timeoutHandle);
+    return result;
+  }); 
+}
 
 module.exports = ShardingClient;

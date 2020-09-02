@@ -3,3 +3,4 @@
 .glitch-assets
 node_modules/
 test/
+/logs.txt
