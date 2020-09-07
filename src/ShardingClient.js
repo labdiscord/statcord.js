@@ -81,16 +81,16 @@ class ShardingClient extends EventEmitter {
             // If this is the last shard, wait until it is ready
             if (shard.id + 1 == this.manager.totalShards && autopost) {
                 // When ready start auto post
-                if (this.debug) this.debugLog("Listening for final shard \"ready\" event");
+                this.debugLog("Listening for final shard \"ready\" event");
                 currShard.once("ready", () => {
                     setTimeout(async () => {
-                        if (this.debug) this.debugLog("Starting autopost");
+                        this.debugLog("Starting autopost");
                         this.emit("autopost-start");
 
-                        if (this.debug) this.debugLog("Initial post");
+                        this.debugLog("Initial post");
                         this.post();
 
-                        if (this.debug) this.debugLog("Starting interval");
+                        this.debugLog("Starting interval");
 
                         setInterval(() => {
                             this.post();
@@ -109,10 +109,10 @@ class ShardingClient extends EventEmitter {
                 let args = message.split("|=-ssc-=|"); // get the args
 
                 if (args[0] == "sscpc") { // PostCommand message
-                    if (this.debug) this.debugLog("Received command post from shard");
+                    this.debugLog("Received command post from shard");
                     this.postCommand(args[1], args[2]);
                 } else if (args[0] == "sscp") { // Post message
-                    if (this.debug) this.debugLog("Received full post request from shard");
+                    this.debugLog("Received full post request from shard");
                     this.post();
                 }
             });
@@ -213,21 +213,21 @@ class ShardingClient extends EventEmitter {
 
         // Get custom field one value
         if (this.customFields.get(1)) {
-            if (this.debug) this.debugLog("Start getting custom field 1", "post");
+            this.debugLog("Start getting custom field 1", "post");
             requestBody.custom1 = await this.customFields.get(1)(this.manager);
-            if (this.debug) this.debugLog(requestBody.custom1, "post");
-            if (this.debug) this.debugLog("End getting custom field 1", "post");
+            this.debugLog(requestBody.custom1, "post");
+            this.debugLog("End getting custom field 1", "post");
         }
 
         // Get custom field two value
         if (this.customFields.get(2)) {
-            if (this.debug) this.debugLog("Start getting custom field 2", "post");
+            this.debugLog("Start getting custom field 2", "post");
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
-            if (this.debug) this.debugLog(requestBody.custom2, "post");
-            if (this.debug) this.debugLog("End getting custom field 2", "post");
+            this.debugLog(requestBody.custom2, "post");
+            this.debugLog("End getting custom field 2", "post");
         }
 
-        if (this.debug) {
+        {
             this.debugLog(
               `Post Data\n${util.inspect(requestBody, false, null, false)}`,
               "post"
@@ -261,16 +261,14 @@ class ShardingClient extends EventEmitter {
             return;
         }
 
-        if (this.debug) {
-            this.debugLog(
-              `Fetch response\n${util.inspect(response, false, null, false)}`,
-              "post"
-            );
-        }
+        this.debugLog(
+            `Fetch response\n${util.inspect(response, false, null, false)}`,
+            "post"
+        );
 
         // Statcord server side errors
         if (response.status >= 500) {
-            if (this.debug) this.debugLog("HTTP 500 error received", "post");
+            this.debugLog("HTTP 500 error received", "post");
             this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
             return;
         }
@@ -280,31 +278,29 @@ class ShardingClient extends EventEmitter {
         try {
             responseData = await response.json();
         } catch {
-            if (this.debug) this.debugLog("Invalid response data received", "post");
+            this.debugLog("Invalid response data received", "post");
             this.emit("post", new Error(`Statcord server error, invalid json response`));
             return;
         }
 
-        if (this.debug) {
-            this.debugLog(
-              `Response data\n${util.inspect(responseData, false, null, false)}`,
-              "post"
-            );
-        }
+        this.debugLog(
+            `Response data\n${util.inspect(responseData, false, null, false)}`,
+            "post"
+        );
 
         // Check response for errors
         if (response.status == 200) {
-            if (this.debug) this.debugLog("HTTP code 200", "post");
+            this.debugLog("HTTP code 200", "post");
             // Success
             this.emit("post", false);
         } else if (response.status == 400 || response.status == 429) {
-            if (this.debug) this.debugLog(`HTTP code ${response.status}`, "post");
-            if (this.debug) this.debugLog(responseData.error, "post");
-            if (this.debug) this.debugLog(responseData.message, "post");
+            this.debugLog(`HTTP code ${response.status}`, "post");
+            this.debugLog(responseData.error, "post");
+            this.debugLog(responseData.message, "post");
             // Bad request or rate limit hit
             this.emit("post", new Error(responseData.message));
         } else {
-            if (this.debug) this.debugLog(`UNKNOWN HTTP ERROR: ${response.status}`, "post");
+            this.debugLog(`UNKNOWN HTTP ERROR: ${response.status}`, "post");
             // Other
             this.emit("post", new Error("An unknown error has occurred"));
         }
@@ -355,8 +351,9 @@ class ShardingClient extends EventEmitter {
         this.customFields.set(customFieldNumber, handler);
     }
 
-    
     debugLog(info, type = "") {
+        if (!this.debug) return;
+
         let out = `[Statcord${type.length > 1 ? ` - ${type}` : ""}] ${info}`;
 
         if (this.debug_outfile) {
