@@ -212,7 +212,7 @@ const statcord = new Statcord.Client({
     postCpuStatistics: function()=>{
         return 0 // or whatever function you want to use to get CPU stats
     },
-    postMemStatistics: function()=>{
+    postMemStatistics: async function()=>{ //Async Functions also work
         return 0 // or whatever function you want to use to get CPU stats
     },
     postNetworkStatistics: false
