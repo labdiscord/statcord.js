@@ -1,19 +1,28 @@
 // Modules
 const fetch = require("node-fetch");
 const si = require("systeminformation");
-const { EventEmitter } = require("events");
+const {
+    EventEmitter
+} = require("events");
 
 class Statcord extends EventEmitter {
     constructor(options) {
         super();
 
-        const { key, client } = options;
-        let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
-        
+        const {
+            key,
+            client
+        } = options;
+        let {
+            postCpuStatistics,
+            postMemStatistics,
+            postNetworkStatistics
+        } = options;
+
         // Check for discord.js
         try {
             this.discord = require("discord.js");
-        } catch(e) {
+        } catch (e) {
             throw new Error("statcord.js needs discord.js to function");
         }
 
@@ -26,9 +35,9 @@ class Statcord extends EventEmitter {
         if (!(client instanceof this.discord.Client)) throw new TypeError('"client" is not a discord.js client');
         // Post arg error checking
         if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
-        if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
+        if (typeof postCpuStatistics !== "boolean" && typeof postCpuStatistics !== "function") throw new TypeError('"postCpuStatistics" is not of type boolean, function, or async function');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
-        if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
+        if (typeof postMemStatistics !== "boolean" && typeof postMemStatistics !== "function") throw new TypeError('"postMemStatistics" is not of type boolean, function, or async function');
         if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
         if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
 
@@ -121,17 +130,23 @@ class Statcord extends EventEmitter {
         let cpuload = 0;
 
         // Get mem stats
-        if (this.postMemStatistics) {
+        if (this.postMemStatistics && typeof this.postMemStatistics == 'boolean') {
             const mem = await si.mem();
 
             // Get active memory in MB
             memactive = mem.active;
             // Get active mem load in %
             memload = Math.round(mem.active / mem.total * 100);
+        } else if (this.postMemStatistics && typeof this.postMemStatistics == 'function') {
+            if (this.postMemStatistics.constructor.name === "AsyncFunction") {
+                memload = await this.postMemStatistics()
+            } else {
+                memload = this.postMemStatistics()
+            }
         }
 
         // Get cpu stats
-        if (this.postCpuStatistics) {
+        if (this.postCpuStatistics && typeof this.postCpuStatistics == 'boolean') {
             const platform = require("os").platform();
 
             // Current load is not avaliable on bsd
@@ -140,6 +155,12 @@ class Statcord extends EventEmitter {
 
                 // Get current load
                 cpuload = Math.round(load.currentload);
+            }
+        } else if (this.postCpuStatistics && typeof this.postCpuStatistics == 'function') {
+            if (this.postCpuStatistics.constructor.name === "AsyncFunction") {
+                cpuload = await this.postCpuStatistics()
+            } else {
+                cpuload = this.postCpuStatistics()
             }
         }
 
@@ -174,7 +195,7 @@ class Statcord extends EventEmitter {
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
-        
+
         // Create post request
         let response;
         try {
@@ -195,7 +216,7 @@ class Statcord extends EventEmitter {
             }
 
             return;
-        } 
+        }
 
         // Server error on statcord
         if (response.status >= 500) {
@@ -232,13 +253,13 @@ class Statcord extends EventEmitter {
 
         console.log("Statcord Auto Post Started");
         let post = await this.post(); // Create first post
-    
+
         // set interval to post every hour
         setInterval(
             async () => {
-                await this.post(); // post once every hour
-            },
-            60000
+                    await this.post(); // post once every hour
+                },
+                60000
         );
 
         // set autoposting var

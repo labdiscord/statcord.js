@@ -2,7 +2,9 @@
 const fetch = require("node-fetch");
 const si = require("systeminformation");
 const ShardingUtil = require("./util/shardUtil");
-const { EventEmitter } = require("events");
+const {
+    EventEmitter
+} = require("events");
 const util = require("util");
 const fs = require("fs");
 
@@ -21,8 +23,16 @@ class ShardingClient extends EventEmitter {
         this.debug = options.debug.enabled || false;
         this.debug_outfile = options.debug.outfile || null;
 
-        const { key, manager } = options;
-        let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
+        const {
+            key,
+            manager
+        } = options;
+        let {
+            postCpuStatistics,
+            postMemStatistics,
+            postNetworkStatistics,
+            autopost
+        } = options;
 
         // Check for discord.js
         try {
@@ -43,9 +53,9 @@ class ShardingClient extends EventEmitter {
         if (typeof autopost !== "boolean") throw new TypeError('"autopost" is not of type boolean');
         // Post arg error checking
         if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
-        if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
+        if (typeof postCpuStatistics !== "boolean" && typeof postCpuStatistics !== "function") throw new TypeError('"postCpuStatistics" is not of type boolean, function, or async function');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
-        if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
+        if (typeof postMemStatistics !== "boolean" && typeof postMemStatistics !== "function") throw new TypeError('"postMemStatistics" is not of type boolean, function, or async function');
         if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
         if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
 
@@ -169,17 +179,23 @@ class ShardingClient extends EventEmitter {
         let cpuload = 0;
 
         // Get mem stats
-        if (this.postMemStatistics) {
+        if (this.postMemStatistics && typeof this.postMemStatistics == 'boolean') {
             const mem = await si.mem();
 
             // Get active memory in MB
             memactive = mem.active;
             // Get active mem load in %
             memload = Math.round(mem.active / mem.total * 100);
+        } else if (this.postMemStatistics && typeof this.postMemStatistics == 'function') {
+            if (this.postMemStatistics.constructor.name === "AsyncFunction") {
+                memload = await this.postMemStatistics()
+            } else {
+                memload = this.postMemStatistics()
+            }
         }
 
         // Get cpu stats
-        if (this.postCpuStatistics) {
+        if (this.postCpuStatistics && typeof this.postCpuStatistics == 'boolean') {
             const platform = require("os").platform();
 
             // Current load is not avaliable on bsd
@@ -188,6 +204,12 @@ class ShardingClient extends EventEmitter {
 
                 // Get current load
                 cpuload = Math.round(load.currentload);
+            }
+        } else if (this.postCpuStatistics && typeof this.postCpuStatistics == 'function') {
+            if (this.postCpuStatistics.constructor.name === "AsyncFunction") {
+                cpuload = await this.postCpuStatistics()
+            } else {
+                cpuload = this.postCpuStatistics()
             }
         }
 
@@ -229,8 +251,8 @@ class ShardingClient extends EventEmitter {
 
         {
             this.debugLog(
-              `Post Data\n${util.inspect(requestBody, false, null, false)}`,
-              "post"
+                `Post Data\n${util.inspect(requestBody, false, null, false)}`,
+                "post"
             );
         }
 
