@@ -142,7 +142,7 @@ class ShardingClient extends EventEmitter {
               );
 
               bandwidth = used_bytes_latest - this.used_bytes;
-              
+
               this.used_bytes = used_bytes_latest;
             }
         }
@@ -182,24 +182,36 @@ class ShardingClient extends EventEmitter {
 
         // Get mem stats
         if (this.postMemStatistics) {
-            const mem = await si.mem();
+            if (typeof this.postMemStatistics == "function") [memactive, memload] = await this.postMemStatistics();
+            else {
+                const mem = await si.mem();
 
-            // Get active memory in MB
-            memactive = mem.active;
-            // Get active mem load in %
-            memload = Math.round(mem.active / mem.total * 100);
+                // Get active memory in MB
+                memactive = mem.active;
+                // Get active mem load in %
+                memload = Math.round(
+                    (mem.active / mem.total) * 100
+                );
+            }
         }
 
         // Get cpu stats
         if (this.postCpuStatistics) {
-            const platform = require("os").platform();
+            if (typeof this.postCpuStatistics == "function") cpuload = await this.postCpuStatistics();
+            else {
+                const platform = require("os").platform();
 
-            // Current load is not avaliable on bsd
-            if (platform !== "freebsd" && platform !== "netbsd" && platform !== "openbsd") {
-                const load = await si.currentLoad();
+                // Current load is not avaliable on bsd
+                if (
+                    platform !== "freebsd" &&
+                    platform !== "netbsd" &&
+                    platform !== "openbsd"
+                ) {
+                    const load = await si.currentLoad();
 
-                // Get current load
-                cpuload = Math.round(load.currentload);
+                    // Get current load
+                    cpuload = Math.round(load.currentload);
+                }
             }
         }
 

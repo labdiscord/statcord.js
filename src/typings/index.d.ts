@@ -7,7 +7,7 @@ declare module "statcord.js" {
     interface BaseClientOptions {
         key: string;
         postCpuStatistics?: boolean | function (): Promise<number>;
-        postMemStatistics?: boolean | function (): Promise<number>;
+        postMemStatistics?: boolean | function (): Promise<[number, number]>;
         postNetworkStatistics?: boolean | function (): Promise<number>;
         debug?: {
             enabled: boolean;
