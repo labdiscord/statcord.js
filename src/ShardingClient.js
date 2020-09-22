@@ -43,11 +43,11 @@ class ShardingClient extends EventEmitter {
         if (typeof autopost !== "boolean") throw new TypeError('"autopost" is not of type boolean');
         // Post arg error checking
         if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
-        if (typeof postCpuStatistics !== "boolean") throw new TypeError('"postCpuStatistics" is not of type boolean');
+        if (typeof postCpuStatistics !== "boolean" || typeof postCpuStatistics !== "function") throw new TypeError('"postCpuStatistics" is not of type boolean or function');
         if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
-        if (typeof postMemStatistics !== "boolean") throw new TypeError('"postMemStatistics" is not of type boolean');
+        if (typeof postMemStatistics !== "boolean" || typeof postMemStatistics !== "function") throw new TypeError('"postMemStatistics" is not of type boolean or function');
         if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
-        if (typeof postNetworkStatistics !== "boolean") throw new TypeError('"postNetworkStatistics" is not of type boolean');
+        if (typeof postNetworkStatistics !== "boolean" || typeof postNetworkStatistics !== "function") throw new TypeError('"postNetworkStatistics" is not of type boolean or function');
 
         // Local config
         this.autoposting = autopost;
@@ -126,13 +126,25 @@ class ShardingClient extends EventEmitter {
         let bandwidth = 0;
 
         if (this.postNetworkStatistics) {
-            // Set initial used network bytes count
-            if (this.used_bytes <= 0) this.used_bytes = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
+            if (typeof this.postNetworkStatistics == "function") bandwidth = await this.postNetworkStatistics();
+            else {
+              // Set initial used network bytes count
+              if (this.used_bytes <= 0)
+                this.used_bytes = (await si.networkStats()).reduce(
+                  (prev, current) => prev + current.rx_bytes,
+                  0
+                );
 
-            // Calculate used bandwidth
-            let used_bytes_latest = (await si.networkStats()).reduce((prev, current) => prev + current.rx_bytes, 0);
-            bandwidth = used_bytes_latest - this.used_bytes;
-            this.used_bytes = used_bytes_latest;
+              // Calculate used bandwidth
+              let used_bytes_latest = (await si.networkStats()).reduce(
+                (prev, current) => prev + current.rx_bytes,
+                0
+              );
+
+              bandwidth = used_bytes_latest - this.used_bytes;
+              
+              this.used_bytes = used_bytes_latest;
+            }
         }
 
         // counts

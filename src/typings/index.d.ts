@@ -6,9 +6,9 @@ declare module "statcord.js" {
     // Create options
     interface BaseClientOptions {
         key: string;
-        postCpuStatistics?: boolean;
-        postMemStatistics?: boolean;
-        postNetworkStatistics?: boolean;
+        postCpuStatistics?: boolean | function (): Promise<number>;
+        postMemStatistics?: boolean | function (): Promise<number>;
+        postNetworkStatistics?: boolean | function (): Promise<number>;
         debug?: {
             enabled: boolean;
             outfile?: string;
