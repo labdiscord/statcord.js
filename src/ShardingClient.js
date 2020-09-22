@@ -42,11 +42,11 @@ class ShardingClient extends EventEmitter {
         if (!autopost == null || autopost == undefined) autopost = true;
         if (typeof autopost !== "boolean") throw new TypeError('"autopost" is not of type boolean');
         // Post arg error checking
-        if (postCpuStatistics == null || postCpuStatistics == undefined) postCpuStatistics = true;
+        if (postCpuStatistics == null && postCpuStatistics == undefined) postCpuStatistics = true;
         if (typeof postCpuStatistics !== "boolean" || typeof postCpuStatistics !== "function") throw new TypeError('"postCpuStatistics" is not of type boolean or function');
-        if (postMemStatistics == null || postMemStatistics == undefined) postMemStatistics = true;
+        if (postMemStatistics == null && postMemStatistics == undefined) postMemStatistics = true;
         if (typeof postMemStatistics !== "boolean" || typeof postMemStatistics !== "function") throw new TypeError('"postMemStatistics" is not of type boolean or function');
-        if (postNetworkStatistics == null || postNetworkStatistics == undefined) postNetworkStatistics = true;
+        if (postNetworkStatistics == null && postNetworkStatistics == undefined) postNetworkStatistics = true;
         if (typeof postNetworkStatistics !== "boolean" || typeof postNetworkStatistics !== "function") throw new TypeError('"postNetworkStatistics" is not of type boolean or function');
 
         // Local config
