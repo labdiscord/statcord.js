@@ -230,7 +230,6 @@ class Statcord extends EventEmitter {
         // Non-Sharding client
         if (this.sharding) throw new Error("Please use the statcord sharding client if you wish to use shards");
 
-        console.log("Statcord Auto Post Started");
         let post = await this.post(); // Create first post
     
         // set interval to post every hour
