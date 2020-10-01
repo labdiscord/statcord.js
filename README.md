@@ -212,7 +212,7 @@ client.login("TOKEN");
     // Create statcord sharding client
     const statcord = new Statcord.ShardingClient({
         key: "statcord.com-APIKEY",
-        client,
+        manager,
         postCpuStatistics: false, /* Whether to post CPU statistics or not, defaults to true */
         postMemStatistics: false, /* Whether to post memory statistics or not, defaults to true */
         postNetworkStatistics: false, /* Whether to post network statistics or not, defaults to true */
@@ -299,6 +299,37 @@ client.on("message", async (message) => {
 
 client.login("TOKEN");
 ```
+
+
+## Contributing
+
+Contributions are always welcome!\
+Take a look at any existing issues on this repository for starting places to help contribute towards, or simply create your own new contribution to the project.
+
+When you are ready, simply create a pull request for your contribution and we will review it whenever we can!
+
+### Donating
+
+You can also help me and the project out by sponsoring me through a [donation on PayPal](http://paypal.me/labdiscord).
+
+
+<!-- Discussion & Support -->
+## Discussion, Support and Issues
+
+Need support with this project, have found an issue or want to chat with others about contributing to the project?
+> Please check the project's issues page first for support & bugs!
+
+Not found what you need here?
+
+* If you have an issue, please create a GitHub issue here to report it, include as much detail as you can.
+* _Alternatively,_ You can join our Discord server to discuss any issue or to get support for the project.:
+
+<a href="http://statcord.com/discord" target="_blank">
+    <img src="https://discordapp.com/api/guilds/608711879858192479/embed.png" alt="Discord" height="30">
+</a>
+
+
+
 
 [1]: #statcord
 
