@@ -58,8 +58,6 @@ class ShardingClient extends EventEmitter {
         this.manager = manager;
 
         // General config
-        this.v11 = this.discord.version <= "12.0.0";
-        this.v12 = this.discord.version >= "12.0.0";
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
@@ -136,17 +134,8 @@ class ShardingClient extends EventEmitter {
         }
 
         // counts
-        let guild_count = 0;
-        let user_count = 0;
-
-        // V12 code
-        if (this.v12) {
-            guild_count = await getGuildCountV12(this.manager);
-            user_count = await getUserCountV12(this.manager);
-        } else if (this.v11) { // V11 code
-            guild_count = await getGuildCountV11(this.manager);
-            user_count = await getUserCountV11(this.manager);
-        }
+        let guild_count = await getGuildCountV12(this.manager);
+        let user_count = await getUserCountV12(this.manager);
 
         // Get and sort popular commands
         let popular = [];
@@ -376,15 +365,5 @@ async function getUserCountV12(manager) {
     return memberNum.reduce((prev, memberCount) => prev + memberCount, 0);
 }
 // end
-
-// v11 sharding gets
-async function getGuildCountV11(manager) {
-    return (await manager.fetchClientValues("guilds.size")).reduce((prev, current) => prev + current, 0);
-}
-
-async function getUserCountV11(manager) {
-    return (await manager.fetchClientValues("users.size")).reduce((prev, current) => prev + current, 0);
-}
-//end
 
 module.exports = ShardingClient;
