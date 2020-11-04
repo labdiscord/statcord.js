@@ -44,8 +44,6 @@ class Statcord extends EventEmitter {
         this.client = client;
 
         // General config
-        this.v11 = this.discord.version <= "12.0.0";
-        this.v12 = this.discord.version >= "12.0.0";
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
@@ -88,18 +86,8 @@ class Statcord extends EventEmitter {
         }
 
         // counts
-        let guild_count = 0;
-        let user_count = 0;
-
-        // V12 code
-        if (this.v12) {
-            guild_count = this.client.guilds.cache.size;
-            user_count = this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0);
-
-        } else if (this.v11) { // V11 code
-            guild_count = this.client.guilds.size;
-            user_count = this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
-        }
+        let guild_count = this.client.guilds.cache.size;
+        let user_count = this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0);
 
         // Get and sort popular commands
         let popular = [];
