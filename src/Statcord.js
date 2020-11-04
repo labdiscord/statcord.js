@@ -94,10 +94,11 @@ class Statcord extends EventEmitter {
         // V12 code
         if (this.v12) {
             guild_count = this.client.guilds.cache.size;
-            user_count = this.client.users.cache.size;
+            user_count = this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0);
+
         } else if (this.v11) { // V11 code
             guild_count = this.client.guilds.size;
-            user_count = this.client.users.size;
+            user_count = this.client.guilds.reduce((prev, curr) => prev + curr.memberCount, 0);
         }
 
         // Get and sort popular commands

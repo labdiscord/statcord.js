@@ -383,7 +383,7 @@ async function getGuildCountV11(manager) {
 }
 
 async function getUserCountV11(manager) {
-    return (await manager.fetchClientValues("users.size")).reduce((prev, current) => prev + current, 0);
+    return (await manager.fetchClientValues("this.guilds.reduce((prev, guild) => prev + guild.memberCount, 0)")).reduce((prev, current) => prev + current, 0);
 }
 //end
 
