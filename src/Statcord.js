@@ -101,9 +101,6 @@ class Statcord extends EventEmitter {
             });
         }
 
-        // Limit popular to the 5 most popular
-        if (popular.length > 5) popular.length = 5;
-
         // Get system information
         let memactive = 0;
         let memload = 0;
