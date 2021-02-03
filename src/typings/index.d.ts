@@ -64,7 +64,7 @@ declare module "statcord.js" {
         public static post(client: Discord.Client): void;
         public static postCommand(command_name: string, author_id: string, client: Discord.Client): void; 
 
-        private post(): Promise<void>;
+        public post(): Promise<void>;
         private postCommand(command_name: string, author: string): Promise<void>;
         public registerCustomFieldHandler(customFieldNumber: 1 | 2, handler: (manager: Discord.ShardingManager) => Promise<string>): Promise<null>;
     }
