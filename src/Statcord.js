@@ -87,7 +87,7 @@ class Statcord extends EventEmitter {
 
         // counts
         let guild_count = this.client.guilds.cache.size;
-        let user_count = this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0);
+        let user_count = this.client.users.cache.size; // Won't show the accurate user count unless the "Server Members" intent is enabled on the bot page in the discord developer web page
 
         // Get and sort popular commands
         let popular = [];

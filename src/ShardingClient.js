@@ -134,8 +134,8 @@ class ShardingClient extends EventEmitter {
         }
 
         // counts
-        let guild_count = await getGuildCountV12(this.manager);
-        let user_count = await getUserCountV12(this.manager);
+        let guild_count = await getGuildCount(this.manager);
+        let user_count = await getUserCount(this.manager); // Won't show the accurate user count unless the "Server Members" intent is enabled on the bot page in the discord developer web page
 
         // Get and sort popular commands
         let popular = [];
@@ -216,7 +216,7 @@ class ShardingClient extends EventEmitter {
             this.debugLog("End getting custom field 2", "post");
         }
 
-        {
+        if (this.debug) {
             this.debugLog(
               `Post Data\n${util.inspect(requestBody, false, null, false)}`,
               "post"
@@ -356,13 +356,12 @@ class ShardingClient extends EventEmitter {
 }
 
 // V12 sharding gets 
-async function getGuildCountV12(manager) {
+async function getGuildCount(manager) {
     return (await manager.fetchClientValues("guilds.cache.size")).reduce((prev, current) => prev + current, 0);
 }
 
-async function getUserCountV12(manager) {
-    const memberNum = await manager.broadcastEval('this.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0)');
-    return memberNum.reduce((prev, memberCount) => prev + memberCount, 0);
+async function getUserCount(manager) {
+    return (await manager.broadcastEval("users.cache.size")).reduce((prev, memberCount) => prev + memberCount, 0);
 }
 // end
 
