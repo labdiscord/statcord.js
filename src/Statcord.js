@@ -87,7 +87,7 @@ class Statcord extends EventEmitter {
 
         // counts
         let guild_count = this.client.guilds.cache.size;
-        let user_count = this.client.guilds.cache.reduce((prev, curr) => prev + curr.memberCount, 0);
+        let user_count = this.client.guilds.cache.filter(guild => guild.available).reduce((prev, curr) => prev + curr.memberCount, 0);
 
         // Get and sort popular commands
         let popular = [];
