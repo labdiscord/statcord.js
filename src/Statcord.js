@@ -125,7 +125,7 @@ class Statcord extends EventEmitter {
                 const load = await si.currentLoad();
 
                 // Get current load
-                cpuload = Math.round(load.currentload);
+                cpuload = Math.round(load.currentLoad);
             }
         }
 
