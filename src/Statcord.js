@@ -1,12 +1,15 @@
 // Modules
 const fetch = require("node-fetch");
 const si = require("systeminformation");
+const { EventEmitter } = require("events");
 
-class Statcord {
+class Statcord extends EventEmitter {
     constructor(options) {
+        super();
+
         const { key, client } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics } = options;
-
+        
         // Check for discord.js
         try {
             this.discord = require("discord.js");
@@ -32,14 +35,15 @@ class Statcord {
         // Local config
         this.autoposting = false;
 
+        // Local config
+        this.autoposting = false;
+
         // API config
-        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; // TODO update for full release
+        this.baseApiUrl = "https://api.statcord.com/beta/stats";
         this.key = key;
         this.client = client;
 
         // General config
-        this.v11 = this.discord.version <= "12.0.0";
-        this.v12 = this.discord.version >= "12.0.0";
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
@@ -82,17 +86,8 @@ class Statcord {
         }
 
         // counts
-        let guild_count = 0;
-        let user_count = 0;
-
-        // V12 code
-        if (this.v12) {
-            guild_count = this.client.guilds.cache.size;
-            user_count = this.client.users.cache.size;
-        } else if (this.v11) { // V11 code
-            guild_count = this.client.guilds.size;
-            user_count = this.client.users.size;
-        }
+        let guild_count = this.client.guilds.cache.size;
+        let user_count = this.client.guilds.cache.filter(guild => guild.available).reduce((prev, curr) => prev + curr.memberCount, 0);
 
         // Get and sort popular commands
         let popular = [];
@@ -105,9 +100,6 @@ class Statcord {
                 count: `${sortedPopular[i].count}`
             });
         }
-
-        // Limit popular to the 5 most popular
-        if (popular.length > 5) popular.length = 5;
 
         // Get system information
         let memactive = 0;
@@ -133,7 +125,7 @@ class Statcord {
                 const load = await si.currentLoad();
 
                 // Get current load
-                cpuload = Math.round(load.currentload);
+                cpuload = Math.round(load.currentLoad);
             }
         }
 
@@ -180,7 +172,7 @@ class Statcord {
                 }
             });
         } catch (e) {
-            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+            this.emit("post", "Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
 
             if (!this.autoposting) {
                 setTimeout(() => {
@@ -192,29 +184,30 @@ class Statcord {
         } 
 
         // Server error on statcord
-        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) {
+            this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
+            return;
+        }
 
         // Get body as JSON
         let responseData;
         try {
             responseData = await response.json();
         } catch {
-            return new Error(`Statcord server error, invalid json response`);
+            this.emit("post", new Error(`Statcord server error, invalid json response`));
+            return;
         }
 
         // Check response for errors
         if (response.status == 200) {
             // Success
-            if (!responseData.error) return Promise.resolve(false);
-        } else if (response.status == 400) {
-            // Bad request
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
-        } else if (response.status == 429) {
-            // Rate limit hit
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
+            this.emit("post", false);
+        } else if (response.status == 400 || response.status == 429) {
+            // Bad request or Rate limit hit
+            if (responseData.error) this.emit("post", new Error(responseData.message));
         } else {
             // Other
-            return Promise.resolve(new Error("An unknown error has occurred"));
+            this.emit("post", new Error("An unknown error has occurred"));
         }
     }
 
@@ -223,7 +216,6 @@ class Statcord {
         // Non-Sharding client
         if (this.sharding) throw new Error("Please use the statcord sharding client if you wish to use shards");
 
-        console.log("Statcord Auto Post Started");
         let post = await this.post(); // Create first post
     
         // set interval to post every hour
@@ -236,6 +228,8 @@ class Statcord {
 
         // set autoposting var
         this.autoposting = true;
+
+        this.emit("autopost-start");
 
         // resolve with initial errors
         return Promise.resolve(post);
@@ -275,9 +269,13 @@ class Statcord {
     }
 
     // Register the function to get the values for posting
-    registerCustomFieldHandler(customFieldNumber, handler) {
+    async registerCustomFieldHandler(customFieldNumber, handler) {
         // Check if the handler already exists
-        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+        if (this.customFields.get(customFieldNumber)) throw new Error("Handler already exists");
+
+        // Testing
+        if (typeof handler !== "function") throw new Error("Handler is not a function");
+        if (typeof (await handler(this.client)) !== "string") throw new Error("Handler doesn't return strings");
 
         // If it doen't set it
         this.customFields.set(customFieldNumber, handler);

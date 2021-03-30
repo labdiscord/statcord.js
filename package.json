@@ -1,6 +1,6 @@
 {
   "name": "statcord.js-beta",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Upload Statcord info to the official API!",
   "main": "src/index.js",
   "keywords": [
@@ -16,7 +16,7 @@
     "systeminformation": "^4.26.9"
   },
   "devDependencies": {
-    "discord.js": "^12.3.1"
+    "discord.js": "^12.5.1"
   },
   "repository": {
     "type": "git",

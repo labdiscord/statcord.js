@@ -2,19 +2,32 @@
 const fetch = require("node-fetch");
 const si = require("systeminformation");
 const ShardingUtil = require("./util/shardUtil");
+const { EventEmitter } = require("events");
+const util = require("util");
+const fs = require("fs");
 
-class ShardingClient {
+class ShardingClient extends EventEmitter {
     static post = ShardingUtil.post;
     static postCommand = ShardingUtil.postCommand;
 
     constructor(options) {
+        super();
+
+        if (!options.debug) options.debug = {
+            enabled: false,
+            outfile: null
+        }
+
+        this.debug = options.debug.enabled || false;
+        this.debug_outfile = options.debug.outfile || null;
+
         const { key, manager } = options;
         let { postCpuStatistics, postMemStatistics, postNetworkStatistics, autopost } = options;
 
         // Check for discord.js
         try {
             this.discord = require("discord.js");
-        } catch(e) {
+        } catch (e) {
             throw new Error("statcord.js needs discord.js to function");
         }
 
@@ -40,13 +53,11 @@ class ShardingClient {
         this.autoposting = autopost;
 
         // API config
-        this.baseApiUrl = "https://beta.statcord.com/logan/stats"; //TODO update before full release
+        this.baseApiUrl = "https://api.statcord.com/beta/stats";
         this.key = key;
         this.manager = manager;
 
         // General config
-        this.v11 = this.discord.version <= "12.0.0";
-        this.v12 = this.discord.version >= "12.0.0";
         this.activeUsers = [];
         this.commandsRun = 0;
         this.popularCommands = [];
@@ -56,7 +67,7 @@ class ShardingClient {
         this.postCpuStatistics = postCpuStatistics;
         this.postMemStatistics = postMemStatistics;
         this.postNetworkStatistics = postNetworkStatistics;
-        
+
         // Create custom fields map
         this.customFields = new Map();
 
@@ -68,16 +79,19 @@ class ShardingClient {
             // If this is the last shard, wait until it is ready
             if (shard.id + 1 == this.manager.totalShards && autopost) {
                 // When ready start auto post
+                this.debugLog("Listening for final shard \"ready\" event");
                 currShard.once("ready", () => {
                     setTimeout(async () => {
-                        console.log("Starting autopost");
+                        this.debugLog("Starting autopost");
+                        this.emit("autopost-start");
 
-                        let initialPostError = await this.post();
+                        this.debugLog("Initial post");
+                        this.post();
 
-                        if (initialPostError) console.error(initialPostError);
+                        this.debugLog("Starting interval");
 
-                        setInterval(async () => {
-                            await this.post();
+                        setInterval(() => {
+                            this.post();
                         }, 60000);
                     }, 200);
                 });
@@ -93,17 +107,20 @@ class ShardingClient {
                 let args = message.split("|=-ssc-=|"); // get the args
 
                 if (args[0] == "sscpc") { // PostCommand message
-                    await this.postCommand(args[1], args[2]);
+                    this.debugLog("Received command post from shard");
+                    this.postCommand(args[1], args[2]);
                 } else if (args[0] == "sscp") { // Post message
-                        let post = await this.post();
-                        if (post) console.error(new Error(post));
-                    }
+                    this.debugLog("Received full post request from shard");
+                    this.post();
+                }
             });
         });
     }
 
     // Post stats to API
     async post() {
+        this.debugLog("Starting post", "post");
+
         let bandwidth = 0;
 
         if (this.postNetworkStatistics) {
@@ -117,17 +134,8 @@ class ShardingClient {
         }
 
         // counts
-        let guild_count = 0;
-        let user_count = 0;
-
-        // V12 code
-        if (this.v12) {
-            guild_count = await getGuildCountV12(this.manager);
-            user_count = await getUserCountV12(this.manager);
-        } else if (this.v11) { // V11 code
-            guild_count = await getGuildCountV11(this.manager);
-            user_count = await getUserCountV11(this.manager);
-        }
+        let guild_count = await getGuildCountV12(this.manager);
+        let user_count = await getUserCountV12(this.manager);
 
         // Get and sort popular commands
         let popular = [];
@@ -194,13 +202,26 @@ class ShardingClient {
 
         // Get custom field one value
         if (this.customFields.get(1)) {
+            this.debugLog("Start getting custom field 1", "post");
             requestBody.custom1 = await this.customFields.get(1)(this.manager);
+            this.debugLog(requestBody.custom1, "post");
+            this.debugLog("End getting custom field 1", "post");
         }
 
         // Get custom field two value
         if (this.customFields.get(2)) {
+            this.debugLog("Start getting custom field 2", "post");
             requestBody.custom2 = await this.customFields.get(2)(this.manager);
-        }     
+            this.debugLog(requestBody.custom2, "post");
+            this.debugLog("End getting custom field 2", "post");
+        }
+
+        {
+            this.debugLog(
+              `Post Data\n${util.inspect(requestBody, false, null, false)}`,
+              "post"
+            );
+        }
 
         // Reset stats
         this.activeUsers = [];
@@ -218,7 +239,7 @@ class ShardingClient {
                 }
             });
         } catch (e) {
-            console.log("Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
+            this.emit("post", "Unable to connect to the Statcord server. Going to automatically try again in 60 seconds, if this problem persists, please visit status.statcord.com");
 
             if (!this.autoposting) {
                 setTimeout(() => {
@@ -229,31 +250,51 @@ class ShardingClient {
             return;
         }
 
+        this.debugLog(
+            `Fetch response\n${util.inspect(response, false, null, false)}`,
+            "post"
+        );
+
         // Statcord server side errors
-        if (response.status >= 500) return new Error(`Statcord server error, statuscode: ${response.status}`);
+        if (response.status >= 500) {
+            this.debugLog("HTTP 500 error received", "post");
+            this.emit("post", new Error(`Statcord server error, statuscode: ${response.status}`));
+            return;
+        }
 
         // Get body as JSON
         let responseData;
         try {
             responseData = await response.json();
         } catch {
-            return new Error(`Statcord server error, invalid json response`);
+            this.debugLog("Invalid response data received", "post");
+            this.emit("post", new Error(`Statcord server error, invalid json response`));
+            return;
         }
+
+        this.debugLog(
+            `Response data\n${util.inspect(responseData, false, null, false)}`,
+            "post"
+        );
 
         // Check response for errors
         if (response.status == 200) {
+            this.debugLog("HTTP code 200", "post");
             // Success
-            if (!responseData.error) return Promise.resolve(false);
-        } else if (response.status == 400) {
-            // Bad request
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
-        } else if (response.status == 429) {
-            // Rate limit hit
-            if (responseData.error) return Promise.resolve(new Error(responseData.message));
+            this.emit("post", false);
+        } else if (response.status == 400 || response.status == 429) {
+            this.debugLog(`HTTP code ${response.status}`, "post");
+            this.debugLog(responseData.error, "post");
+            this.debugLog(responseData.message, "post");
+            // Bad request or rate limit hit
+            this.emit("post", new Error(responseData.message));
         } else {
+            this.debugLog(`UNKNOWN HTTP ERROR: ${response.status}`, "post");
             // Other
-            return Promise.resolve(new Error("An unknown error has occurred"));
+            this.emit("post", new Error("An unknown error has occurred"));
         }
+
+        this.debugLog("Post end", "post");
     }
 
     // Post stats about a command
@@ -287,12 +328,30 @@ class ShardingClient {
     }
 
     // Register the function to get the values for posting
-    registerCustomFieldHandler(customFieldNumber, handler) {
+    async registerCustomFieldHandler(customFieldNumber, handler) {
         // Check if the handler already exists
-        if (this.customFields.get(customFieldNumber)) return new Error("Handler already exists");
+        if (this.customFields.get(customFieldNumber)) throw new Error("Handler already exists");
+
+        // Testing
+        if (typeof handler !== "function") throw new Error("Handler is not a function");
+        if (typeof (await handler(this.manager)) !== "string") throw new Error("Handler doesn't return strings");
 
         // If it doen't set it
         this.customFields.set(customFieldNumber, handler);
+    }
+
+    debugLog(info, type = "") {
+        if (!this.debug) return;
+
+        let out = `[Statcord${type.length > 1 ? ` - ${type}` : ""}] ${info}`;
+
+        if (this.debug_outfile) {
+            fs.appendFile(require("path").join(process.cwd(), this.debug_outfile), out + "\n", (err) => {
+                if (err) console.error(err);
+            });
+        } else {
+            console.info(out);
+        }
     }
 }
 
@@ -306,15 +365,5 @@ async function getUserCountV12(manager) {
     return memberNum.reduce((prev, memberCount) => prev + memberCount, 0);
 }
 // end
-
-// v11 sharding gets
-async function getGuildCountV11(manager) {
-    return (await manager.fetchClientValues("guilds.size")).reduce((prev, current) => prev + current, 0);
-}
-
-async function getUserCountV11(manager) {
-    return (await manager.fetchClientValues("users.size")).reduce((prev, current) => prev + current, 0);
-}
-//end
 
 module.exports = ShardingClient;
