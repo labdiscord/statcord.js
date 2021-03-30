@@ -16,7 +16,7 @@
     "systeminformation": "^4.26.9"
   },
   "devDependencies": {
-    "discord.js": "^12.5.1"
+    "discord.js": "^12.3.1"
   },
   "repository": {
     "type": "git",
