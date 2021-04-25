@@ -39,7 +39,7 @@ class Statcord extends EventEmitter {
         this.autoposting = false;
 
         // API config
-        this.baseApiUrl = "https://statcord.com/logan/stats";
+        this.baseApiUrl = "https://api.statcord.com/v3/stats";
         this.key = key;
         this.client = client;
 
