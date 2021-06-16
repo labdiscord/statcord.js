@@ -135,7 +135,7 @@ class ShardingClient extends EventEmitter {
 
         // counts
         let guild_count = await getGuildCountV12(this.manager);
-        let user_count = await getUserCountV12(this.manager);
+        let user_count = await getUserCountV13(this.manager);
 
         // Get and sort popular commands
         let popular = [];
@@ -353,6 +353,12 @@ class ShardingClient extends EventEmitter {
             console.info(out);
         }
     }
+}
+
+// V13 sharding gets 
+async function getUserCountV13(manager) {
+    const memberNum = await manager.broadcastEval((client) => client.guilds.cache.reduce((prev, guild) => prev + guild.memberCount, 0));
+    return memberNum.reduce((prev, memberCount) => prev + memberCount, 0);
 }
 
 // V12 sharding gets 
