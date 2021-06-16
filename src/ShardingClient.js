@@ -135,7 +135,7 @@ class ShardingClient extends EventEmitter {
 
         // counts
         let guild_count = await getGuildCountV12(this.manager);
-        let user_count = await getUserCountV13(this.manager);
+        let user_count = await getUserCountV12(this.manager);
 
         // Get and sort popular commands
         let popular = [];
@@ -181,7 +181,7 @@ class ShardingClient extends EventEmitter {
         }
 
         // Get client id
-        let id = (await this.manager.broadcastEval("this.user.id"))[0];
+        let id = (await this.manager.fetchClientValues("user.id"))[0];
 
         // Post data
         let requestBody = {
