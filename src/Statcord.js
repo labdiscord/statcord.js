@@ -105,12 +105,10 @@ class Statcord extends EventEmitter {
 
         // Get mem stats
         if (this.postMemStatistics) {
-            const mem = await si.mem();
-
-            // Get active memory in MB
-            memactive = mem.active;
-            // Get active mem load in %
-            memload = Math.round(mem.active / mem.total * 100);
+            // Get heap memory in MB
+            memactive = process.memoryUsage().heapUsed;
+            // Get heap mem load in %
+            memload = Math.round(process.memoryUsage().heapUsed / process.memoryUsage().heapTotal * 100);
         }
 
         // Get cpu stats
