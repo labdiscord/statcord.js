@@ -2,6 +2,7 @@
 const fetch = require("node-fetch");
 const si = require("systeminformation");
 const ShardingUtil = require("./util/shardUtil");
+const kurasuta = require('kurasuta');
 const { EventEmitter } = require("events");
 const util = require("util");
 const fs = require("fs");
@@ -37,7 +38,7 @@ class ShardingClient extends EventEmitter {
         if (!key.startsWith("statcord.com-")) throw new Error('"key" is not prefixed by "statcord.com-", please follow the key format');
         // Manager error handling
         if (!manager) throw new Error('"manager" is missing or undefined');
-        if (!(manager instanceof this.discord.ShardingManager)) throw new TypeError('"manager" is not a discord.js sharding manager');
+        if (!(manager instanceof this.discord.ShardingManager) && !(manager instanceof kurasuta.ShardingManager)) throw new TypeError('"manager" is not a discord.js sharding manager');
         // Auto post arg checking
         if (!autopost == null || autopost == undefined) autopost = true;
         if (typeof autopost !== "boolean") throw new TypeError('"autopost" is not of type boolean');
