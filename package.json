@@ -1,6 +1,6 @@
 {
   "name": "statcord.js",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Upload Statcord info to the official API!",
   "main": "src/index.js",
   "keywords": [
@@ -12,7 +12,7 @@
   "author": "statcord.com",
   "license": "ISC",
   "dependencies": {
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "systeminformation": "^5.7.12"
   },
   "devDependencies": {
