@@ -213,12 +213,12 @@ class Statcord extends EventEmitter {
 
         let post = await this.post(); // Create first post
     
-        // set interval to post every minute
+        // set interval to post every two minutes
         setInterval(
             async () => {
-                await this.post(); // post once every minute
+                await this.post(); // post once every two minutes
             },
-            60000
+            120000
         );
 
         // set autoposting var
