@@ -135,7 +135,7 @@ class ShardingClient extends EventEmitter {
 
         // counts - Compatibility with discord.js v12 and v13.
         let guild_count = await getGuildCountV12(this.manager);
-        let user_count = require("discord.js").version.startsWith("13") ? await getUserCountV13(this.manager) : await getUserCountV12(this.manager);
+        let user_count = require("discord.js").version.startsWith("12") ? await getUserCountV12(this.manager) : await getUserCountV13(this.manager);
 
         // Get and sort popular commands
         let popular = [];
