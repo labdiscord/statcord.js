@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.7.0",
-    "systeminformation": "^5.22.6"
+    "systeminformation": "^5.22.7"
   },
   "devDependencies": {
     "discord.js": "^12.4.1"
